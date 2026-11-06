@@ -1,0 +1,74 @@
+name: Backend
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build-and-test:
+    name: backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # Пока каркаса бэкенда нет, проверка проходит сразу, чтобы не блокировать первые PR.
+      - name: Detect backend
+        id: detect
+        run: |
+          if [ -f backend/global.json ] && ls backend/*.slnx >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Бэкенда пока нет (backend/global.json и backend/*.slnx), проверять нечего."
+          fi
+
+      - uses: actions/setup-dotnet@v6
+        if: steps.detect.outputs.exists == 'true'
+        with:
+          global-json-file: backend/global.json
+
+      - name: Restore
+        if: steps.detect.outputs.exists == 'true'
+        working-directory: backend
+        run: dotnet restore
+
+      - name: Check formatting
+        if: steps.detect.outputs.exists == 'true'
+        working-directory: backend
+        run: dotnet format --verify-no-changes --no-restore
+
+      - name: Build
+        if: steps.detect.outputs.exists == 'true'
+        working-directory: backend
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Check OpenAPI document
+        if: steps.detect.outputs.exists == 'true'
+        working-directory: backend
+        run: |
+          if [ -n "$(git status --porcelain -- openapi)" ]; then
+            git diff -- openapi
+            echo "::error::backend/openapi/openapi.json не совпадает с кодом. Соберите бэкенд и закоммитьте документ."
+            exit 1
+          fi
+
+      - name: Test
+        if: steps.detect.outputs.exists == 'true'
+        working-directory: backend
+        run: dotnet test --no-build --configuration Release

@@ -1,0 +1,34 @@
+{
+  "name": "branch-names",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": [
+        "~ALL"
+      ],
+      "exclude": [
+        "~DEFAULT_BRANCH",
+        "refs/heads/feat/*",
+        "refs/heads/fix/*",
+        "refs/heads/refactor/*",
+        "refs/heads/test/*",
+        "refs/heads/docs/*",
+        "refs/heads/ci/*",
+        "refs/heads/chore/*",
+        "refs/heads/spike/*",
+        "refs/heads/claude/*",
+        "refs/heads/copilot/*",
+        "refs/heads/cursor/*",
+        "refs/heads/codex/*",
+        "refs/heads/gemini/*"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "type": "creation"
+    }
+  ],
+  "bypass_actors": []
+}

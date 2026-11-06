@@ -1,0 +1,73 @@
+name: Frontend
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint-and-build:
+    name: frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # Пока каркаса фронта нет, проверка проходит сразу, чтобы не блокировать первые PR.
+      - name: Detect frontend
+        id: detect
+        run: |
+          if [ -f frontend/package.json ] && [ -f frontend/package-lock.json ] && [ -f frontend/.nvmrc ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Фронта пока нет (frontend/package.json, package-lock.json, .nvmrc), проверять нечего."
+          fi
+
+      - uses: actions/setup-node@v7.0.0
+        if: steps.detect.outputs.exists == 'true'
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install
+        if: steps.detect.outputs.exists == 'true'
+        working-directory: frontend
+        run: npm ci --no-audit --no-fund
+
+      - name: Check API client
+        if: steps.detect.outputs.exists == 'true'
+        working-directory: frontend
+        run: |
+          npm run api:generate --if-present
+          if [ -n "$(git status --porcelain -- src/shared/api)" ]; then
+            git diff -- src/shared/api
+            echo "::error::Клиент API в src/shared/api не совпадает с backend/openapi/openapi.json. Запустите npm run api:generate и закоммитьте результат."
+            exit 1
+          fi
+
+      - name: Lint
+        if: steps.detect.outputs.exists == 'true'
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Test
+        if: steps.detect.outputs.exists == 'true'
+        working-directory: frontend
+        run: npm test
+
+      - name: Build
+        if: steps.detect.outputs.exists == 'true'
+        working-directory: frontend
+        run: npm run build
