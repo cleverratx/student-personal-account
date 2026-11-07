@@ -46,6 +46,8 @@ flowchart LR
 
 ## Контракт API
 
+Черновик всех эндпоинтов с примерами запросов и ответов лежит в [api.md](api.md). По нему фронт делает моки, пока нет бэкенда. Когда появится OpenAPI-документ, главным станет он.
+
 Фронт не описывает запросы руками, а берёт типы из OpenAPI-документа бэкенда:
 
 1. `dotnet build` пишет документ в `backend/openapi/openapi.json`, и он лежит в git. Любое изменение API видно прямо в диффе PR.
@@ -71,7 +73,7 @@ flowchart LR
 - `Lesson` содержит текущее состояние пары, а `LessonChange` хранит историю изменений.
 - `Request` хранит значения полей в `jsonb`, потому что у разных типов заявок разные наборы полей.
 - `Notification` поддерживает типы событий, признак важности и ссылки на связанные объекты.
-- Статусы заявок хранятся английскими кодами: `Submitted`, `InProgress`, `Ready`, `Issued`, `Rejected`. Русские названия показываются в интерфейсе.
+- Статусы заявок хранятся английскими кодами: `Submitted`, `InProgress`, `Ready`, `Issued`, `Rejected`, `Cancelled`. Русские названия показываются в интерфейсе.
 
 ### ER-диаграмма
 
@@ -194,7 +196,7 @@ erDiagram
         uuid RequestTypeId FK
         jsonb Fields "Значения полей заявки"
         datetime CreatedAt
-        string CurrentStatus "Submitted | InProgress | Ready | Issued | Rejected"
+        string CurrentStatus "Submitted | InProgress | Ready | Issued | Rejected | Cancelled"
         date? EstimatedReadyDate "Примерная дата готовности"
         string? IssuePlace "Место выдачи"
         datetime? IssueDeadline "Срок выдачи"

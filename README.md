@@ -106,7 +106,8 @@ dekanat/
 │   └── scripts/                       # deploy.sh, backup.sh
 └── docs/
     ├── product.md                     # сценарии, экраны, чек-лист конкурса
-    ├── architecture.md                # стек, защита данных, API, модель данных
+    ├── architecture.md                # стек, защита данных, модель данных
+    ├── api.md                         # черновик API с примерами для моков
     ├── contributing.md                # ветки, коммиты, PR
     ├── design/                        # токены, карта экранов, логотип
     └── ai/                            # как работаем с ИИ, журнал, промпты
@@ -126,7 +127,8 @@ docker compose up -d --build
 ## Документация
 
 - [docs/product.md](docs/product.md): для кого кабинет, сценарии, экраны и чек-лист требований конкурса.
-- [docs/architecture.md](docs/architecture.md): стек, как разложен код, вход и защита данных, контракт API.
+- [docs/architecture.md](docs/architecture.md): стек, как разложен код, вход и защита данных, модель данных.
+- [docs/api.md](docs/api.md): черновик API с примерами запросов и ответов.
 - [docs/contributing.md](docs/contributing.md): как называть ветки, коммиты и PR и как их вливать.
 - [docs/ai/](docs/ai/): как мы работаем с ИИ, журнал ошибок агентов и сохранённые промпты.
 - [AGENTS.md](AGENTS.md): правила для ИИ-агентов, один файл на всех. Claude Code, Codex, Cursor и Copilot читают его сами, Gemini CLI через `.gemini/settings.json`.
