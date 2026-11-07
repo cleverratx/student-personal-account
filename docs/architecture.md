@@ -61,7 +61,248 @@ flowchart LR
 
 ## Модель данных
 
-Основные сущности: пользователь и его роль, профиль студента, факультет, направление, группа, преподаватель, дисциплина, пара и её изменения, оценка, тип заявки, заявка и история её статусов, объявление, уведомление. ER-диаграмму добавим сюда, когда согласуем модель.
+### Принципы модели
+
+- `User` хранится в ASP.NET Core Identity. Пароль, блокировка и счётчик неудачных попыток обрабатываются Identity.
+- Роли только две: `Student` и `Staff`. Роль `Admin` не используется.
+- `StudentProfile` хранит только группу. Факультет, направление и курс получаются через группу.
+- `StaffProfile` хранит данные сотрудника деканата и его факультет.
+- `Teacher` служит справочником для расписания и не связан с учётной записью.
+- `Lesson` содержит текущее состояние пары, а `LessonChange` хранит историю изменений.
+- `Request` хранит значения полей в `jsonb`, потому что у разных типов заявок разные наборы полей.
+- `Notification` поддерживает типы событий, признак важности и ссылки на связанные объекты.
+- Статусы заявок хранятся английскими кодами: `Submitted`, `InProgress`, `Ready`, `Issued`, `Rejected`. Русские названия показываются в интерфейсе.
+
+### ER-диаграмма
+
+```mermaid
+erDiagram
+    %% Персональные данные: User, StudentProfile, StaffProfile, Assessment
+
+    User {
+        uuid Id PK
+        string UserName UK "Логин"
+        string NormalizedUserName UK
+        string PasswordHash "Хеш пароля"
+        string Role "Student | Staff"
+        int AccessFailedCount "Управляет Identity"
+        datetime? LockoutEnd "Управляет Identity"
+    }
+
+    DataProtectionKey {
+        int Id PK
+        string FriendlyName
+        xml Xml
+    }
+
+    StudentProfile {
+        uuid Id PK
+        uuid UserId FK "1:1 с User"
+        string FullName "ФИО, персональные данные"
+        uuid GroupId FK
+        string GradeBookNumber UK "Номер зачётки, персональные данные"
+    }
+
+    StaffProfile {
+        uuid Id PK
+        uuid UserId FK "1:1 с User"
+        string FullName "ФИО, персональные данные"
+        uuid FacultyId FK
+    }
+
+    Faculty {
+        uuid Id PK
+        string Name UK
+    }
+
+    Program {
+        uuid Id PK
+        uuid FacultyId FK
+        string Name UK
+    }
+
+    Group {
+        uuid Id PK
+        uuid ProgramId FK
+        string Name UK
+        int Course
+    }
+
+    Teacher {
+        uuid Id PK
+        string FullName "ФИО, персональные данные"
+        string Department
+        string Position
+    }
+
+    Discipline {
+        uuid Id PK
+        string Name UK
+        uuid ProgramId FK
+    }
+
+    Lesson {
+        uuid Id PK
+        datetime StartsAt "Текущее время начала"
+        datetime EndsAt "Текущее время окончания"
+        string Room "Текущая аудитория"
+        string LessonType "Лекция | Практика | Лабораторная | Консультация | Экзамен | Зачёт | Дифзачёт"
+        bool IsCancelled "Текущий признак отмены"
+        uuid DisciplineId FK
+        uuid TeacherId FK
+        uuid GroupId FK
+    }
+
+    LessonChange {
+        uuid Id PK
+        uuid LessonId FK
+        string ChangeType "Reschedule | RoomChange | Cancellation"
+        datetime? OldStartsAt
+        datetime? NewStartsAt
+        string? OldRoom
+        string? NewRoom
+        string? Reason
+        datetime ChangedAt
+        uuid ChangedByUserId FK
+    }
+
+    Assessment {
+        uuid Id PK
+        uuid StudentProfileId FK
+        uuid DisciplineId FK
+        int Semester
+        string ControlForm "Экзамен | Зачёт | Дифзачёт | Курсовая | Другое"
+        string Grade "Оценка или зачёт"
+        decimal? Score
+        date Date
+        string Status "Planned | Passed | Failed | Debt | NotAdmitted"
+        string? NotAdmittedReason
+        date? RetakeDeadline
+    }
+
+    RequestType {
+        uuid Id PK
+        string Name UK
+        string Description
+        int ProcessingDays "Срок изготовления в рабочих днях"
+        jsonb FieldSchema "Описание полей заявки"
+    }
+
+    Request {
+        uuid Id PK
+        uuid StudentProfileId FK
+        uuid RequestTypeId FK
+        jsonb Fields "Значения полей заявки"
+        datetime CreatedAt
+        string CurrentStatus "Submitted | InProgress | Ready | Issued | Rejected"
+        date? EstimatedReadyDate "Примерная дата готовности"
+        string? IssuePlace "Место выдачи"
+        datetime? IssueDeadline "Срок выдачи"
+        uuid? RelatedAssessmentId FK "Для заявления на пересдачу"
+    }
+
+    RequestStatusHistory {
+        uuid Id PK
+        uuid RequestId FK
+        string Status
+        string? Comment
+        uuid ChangedByUserId FK
+        datetime ChangedAt
+    }
+
+    Announcement {
+        uuid Id PK
+        string Title
+        string Content
+        datetime PublishedAt
+        datetime? ExpiresAt "Срок актуальности"
+        bool IsImportant "Показывать на Сегодня"
+        string AudienceType "All | Faculty | Group"
+        uuid? FacultyId FK
+        uuid? GroupId FK
+        uuid AuthorUserId FK
+    }
+
+    Notification {
+        uuid Id PK
+        uuid UserId FK
+        string Type "LessonChange | RequestStatus | Announcement | Deadline"
+        string Title
+        string Content
+        bool IsImportant
+        bool IsRead
+        datetime CreatedAt
+        datetime? ReadAt
+        string? DedupKey UK "Защита от повторных уведомлений"
+        uuid? LessonId FK
+        uuid? RequestId FK
+        uuid? AnnouncementId FK
+        uuid? AssessmentId FK
+    }
+
+    User ||--o| StudentProfile : "имеет профиль студента"
+    User ||--o| StaffProfile : "имеет профиль сотрудника"
+    Faculty ||--o{ Program : "содержит"
+    Program ||--o{ Group : "содержит"
+    Group ||--o{ StudentProfile : "включает"
+    Faculty ||--o{ StaffProfile : "относится к"
+    Program ||--o{ Discipline : "включает"
+    Group ||--o{ Lesson : "имеет"
+    Teacher ||--o{ Lesson : "ведёт"
+    Discipline ||--o{ Lesson : "включает"
+    Lesson ||--o{ LessonChange : "имеет историю"
+    User ||--o{ LessonChange : "внёс изменение"
+    StudentProfile ||--o{ Assessment : "имеет"
+    Discipline ||--o{ Assessment : "оценивается"
+    StudentProfile ||--o{ Request : "создаёт"
+    RequestType ||--o{ Request : "определяет"
+    Request ||--o{ RequestStatusHistory : "имеет историю"
+    User ||--o{ RequestStatusHistory : "изменил статус"
+    Assessment ||--o{ Request : "может иметь заявления"
+    User ||--o{ Announcement : "публикует"
+    Faculty ||--o{ Announcement : "адресована факультету"
+    Group ||--o{ Announcement : "адресована группе"
+    User ||--o{ Notification : "получает"
+    Lesson ||--o{ Notification : "может породить"
+    Request ||--o{ Notification : "может породить"
+    Announcement ||--o{ Notification : "может породить"
+    Assessment ||--o{ Notification : "может породить"
+```
+
+### Персональные данные
+
+| Таблица | Персональные поля | Правило доступа |
+|---|---|---|
+| `User` | `UserName`, `PasswordHash` | Пароль хранится только как хеш Identity, логин не показывается другим пользователям |
+| `StudentProfile` | `FullName`, `GradeBookNumber` | Студент видит только свой профиль, сотрудник деканата видит профили студентов своего факультета |
+| `StaffProfile` | `FullName` | Сотрудник видит свой профиль, студенты не видят данные сотрудников |
+| `Teacher` | `FullName` | Справочник расписания, в интерфейсе студента показывается имя преподавателя |
+| `Assessment` | Связь со студентом, оценки и баллы | Студент видит только свои оценки, сотрудник видит оценки в рамках своих полномочий |
+
+### Как модель поддерживает экраны
+
+| Экран | Что даёт модель |
+|---|---|
+| "Сегодня" | `Lesson` содержит актуальные время и аудиторию, `LessonChange` хранит историю, `Assessment` содержит долги и сроки, `Request` содержит примерную готовность, `Announcement` содержит признак важности |
+| "Расписание" | `Lesson` содержит актуальные время, аудиторию и признак отмены, `LessonChange` объясняет изменение |
+| "Учёба" | `Assessment.Status` различает `Debt` и `NotAdmitted`, `NotAdmittedReason` объясняет причину, `RetakeDeadline` показывает срок подачи |
+| "Заявки" | `RequestType.ProcessingDays` помогает рассчитать примерную дату готовности, `Request.EstimatedReadyDate`, `IssuePlace` и `IssueDeadline` поддерживают статусы и выдачу |
+| "Уведомления" | `Notification.Type`, `IsImportant` и связи с `Lesson`, `Request`, `Announcement`, `Assessment` открывают связанный объект |
+| Очередь сотрудника | `Request.CurrentStatus`, `RequestStatusHistory` и `StaffProfile.FacultyId` поддерживают фильтры, историю и разграничение по факультету |
+| Перенос пары | `Lesson` меняется транзакционно, `LessonChange` сохраняет прежнее и новое состояние, `Notification` создаётся с ключом защиты от повторов |
+
+### Индексы и ограничения
+
+- Уникальный индекс `User.UserName`.
+- Уникальный индекс `StudentProfile.GradeBookNumber`.
+- Составной индекс `Lesson (GroupId, StartsAt)` для расписания группы.
+- Составной индекс `Lesson (TeacherId, StartsAt)` для расписания преподавателя.
+- Составной индекс `Lesson (Room, StartsAt)` для проверки занятости аудитории при переносе пары.
+- Индекс `Request (StudentProfileId, CreatedAt DESC)` для списка заявок студента.
+- Индекс `Request (CurrentStatus, CreatedAt)` для очереди сотрудника.
+- Частичный индекс `Notification (UserId) WHERE IsRead = false` для непрочитанных уведомлений.
+- Уникальный индекс `Notification.DedupKey`, если ключ задан.
+- Ограничения `CHECK` для `Role`, `LessonType`, `ControlForm`, `Assessment.Status`, `Request.CurrentStatus`, `Announcement.AudienceType`, `Notification.Type` и `LessonChange.ChangeType`.
 
 ## Нагрузка
 
