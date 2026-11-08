@@ -4,7 +4,7 @@
 
 Это концепт для конкурса, а не официальный сервис какого-либо вуза. Все студенты, преподаватели, оценки и заявки здесь вымышленные.
 
-Сейчас в репозитории лежат документация, правила для людей и агентов и CI. Код приложения появится следующим шагом.
+Сейчас в репозитории лежат документация, правила для людей и агентов, CI и каркас бэкенда с базой. Разделы кабинета и экраны появляются следующими шагами.
 
 ## Как называем проект
 
@@ -33,7 +33,7 @@
 
 ## Структура проекта
 
-Так проект будет выглядеть к сдаче. Здесь только то, без чего не закрыть обязательную часть: пять разделов кабинета, кабинет сотрудника, вход и защиту данных, деплой и описание работы с ИИ. Сейчас из этого есть документация, правила и CI, остальное появляется по ходу работы.
+Так проект будет выглядеть к сдаче. Здесь только то, без чего не закрыть обязательную часть: пять разделов кабинета, кабинет сотрудника, вход и защиту данных, деплой и описание работы с ИИ. Сейчас из этого есть документация, правила, CI и каркас бэкенда, остальное появляется по ходу работы.
 
 ```
 dekanat/
@@ -56,6 +56,7 @@ dekanat/
 │   ├── global.json                    # версия .NET SDK
 │   ├── Directory.Build.props          # net10.0, nullable, предупреждения = ошибки
 │   ├── Directory.Packages.props       # версии NuGet-пакетов
+│   ├── dotnet-tools.json              # dotnet-ef для миграций
 │   ├── Dockerfile
 │   ├── openapi/openapi.json           # контракт API, генерируется при сборке
 │   ├── src/Dekanat.Api/
@@ -71,9 +72,11 @@ dekanat/
 │   │   │   ├── Today/                 # главный экран одним запросом
 │   │   │   └── Staff/                 # кабинет сотрудника
 │   │   └── Infrastructure/
-│   │       ├── Persistence/           # AppDbContext, Migrations/
+│   │       ├── Persistence/           # AppDbContext, Migrations/, проверка базы для health
 │   │       ├── Seed/                  # вымышленные данные и тестовые аккаунты
-│   │       └── Errors/                # ProblemDetails, X-Request-Id
+│   │       ├── Errors/                # ProblemDetails, X-Request-Id
+│   │       ├── Health/                # GET /api/health
+│   │       └── OpenApi/               # настройки OpenAPI-документа
 │   └── tests/
 │       ├── Dekanat.UnitTests/         # статусы заявок, сводка оценок
 │       └── Dekanat.IntegrationTests/  # API + Postgres: вход, роли, "чужое = 404"
@@ -117,11 +120,33 @@ dekanat/
 
 ## Быстрый старт
 
-Каркаса приложения пока нет. Когда он появится, всё будет подниматься одной командой, нужен только Docker с Compose v2:
+Всё поднимается одной командой, нужен только Docker с Compose v2:
 
 ```bash
 cp .env.example .env
 docker compose up -d --build
+```
+
+Пока в compose только база и API. Проверить, что всё живо, можно так: `curl http://localhost:8080/api/health` должен вернуть `{"status":"Healthy","checks":{"database":"Healthy"}}`. Миграции базы применяются сами при старте API.
+
+### Бэкенд без Docker
+
+Нужен .NET SDK 10. База всё равно запускается в Docker, а строка подключения хранится в user-secrets, чтобы пароль не попал в репозиторий:
+
+```bash
+docker compose up -d db
+cd backend
+dotnet user-secrets set --project src/Dekanat.Api "ConnectionStrings:Default" \
+  "Host=localhost;Port=5433;Database=dekanat;Username=dekanat;Password=<POSTGRES_PASSWORD из .env>"
+dotnet run --project src/Dekanat.Api       # API на http://localhost:8080
+dotnet test                                # интеграционным тестам нужен запущенный Docker
+```
+
+Новая миграция создаётся так, файлы лягут в `Infrastructure/Persistence/Migrations/`:
+
+```bash
+dotnet tool restore
+dotnet ef migrations add <ИмяИзменения> --project src/Dekanat.Api
 ```
 
 ## Документация
