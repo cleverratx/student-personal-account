@@ -1,13 +1,12 @@
 using System.Net;
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Dekanat.IntegrationTests
 {
-    public sealed class HealthTests( WebApplicationFactory<Program> factory ) : IClassFixture<WebApplicationFactory<Program>>
+    public sealed class HealthTests( DekanatApiFactory factory )
     {
         [Fact]
-        public async Task HealthIsAvailableWithoutLogin()
+        public async Task HealthIsAvailableWithoutLoginAndSeesDatabase()
         {
             HttpClient client = factory.CreateClient();
 
@@ -19,7 +18,7 @@ namespace Dekanat.IntegrationTests
             using JsonDocument body = JsonDocument.Parse(
                 await response.Content.ReadAsStringAsync( TestContext.Current.CancellationToken ) );
             Assert.Equal( "Healthy", body.RootElement.GetProperty( "status" ).GetString() );
-            Assert.Equal( JsonValueKind.Object, body.RootElement.GetProperty( "checks" ).ValueKind );
+            Assert.Equal( "Healthy", body.RootElement.GetProperty( "checks" ).GetProperty( "database" ).GetString() );
         }
     }
 }

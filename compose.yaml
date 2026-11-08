@@ -1,0 +1,39 @@
+# Всё приложение одной командой: cp .env.example .env && docker compose up -d --build
+# Значения переменных берутся из .env рядом с этим файлом.
+name: dekanat
+
+services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Задайте POSTGRES_DB в .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Задайте POSTGRES_USER в .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Задайте POSTGRES_PASSWORD в .env}
+    volumes:
+      # С PostgreSQL 18 том монтируется в /var/lib/postgresql, а не в /var/lib/postgresql/data.
+      - db-data:/var/lib/postgresql
+    ports:
+      # Только для этой машины: подключиться из IDE или psql. Снаружи сервера база не видна.
+      - "127.0.0.1:${DB_PORT:-5433}:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready --username \"$$POSTGRES_USER\" --dbname \"$$POSTGRES_DB\"" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+    ports:
+      # Пока в compose нет nginx с фронтом, API доступен на этой машине напрямую: http://localhost:8080/api/health.
+      # Когда появится сервис web, порт перейдёт к нему, а API останется только внутри сети compose.
+      - "127.0.0.1:${HTTP_PORT:-8080}:8080"
+
+volumes:
+  db-data:
