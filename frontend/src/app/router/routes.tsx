@@ -1,6 +1,7 @@
-import type { RouteObject } from 'react-router';
-import { HomePage } from '@/pages/home';
+import { Navigate, type RouteObject } from 'react-router';
 import { NotFoundPage } from '@/pages/not-found';
+import { StubPage } from '@/pages/stub';
+import { AppShell } from '@/widgets/app-shell';
 
 // Витрина UI-кита есть только в dev-сервере. В сборке import.meta.env.DEV равно false,
 // и сборщик выкидывает и маршрут, и сам модуль страницы.
@@ -17,7 +18,30 @@ const devRoutes: RouteObject[] = import.meta.env.DEV
   : [];
 
 export const routes: RouteObject[] = [
-  { path: '/', element: <HomePage /> },
+  { path: '/', element: <Navigate to="/today" replace /> },
+  {
+    element: <AppShell role="Student" />,
+    children: [
+      { path: '/today', element: <StubPage title="Сегодня" text="Следующая пара, ближайший срок, важные объявления и активные заявки." /> },
+      { path: '/schedule', element: <StubPage title="Расписание" text="Пары на день и неделю с аудиториями, переносами и отменами." /> },
+      { path: '/grades', element: <StubPage title="Учёба" text="Допуск к сессии, долги и оценки по предметам." /> },
+      { path: '/requests', element: <StubPage title="Заявки" text="Справки и заявления со статусами и примерной датой готовности." /> },
+      { path: '/notifications', element: <StubPage title="Уведомления" text="Объявления, переносы пар и изменения статусов заявок." /> },
+      { path: '/profile', element: <StubPage title="Профиль" text="Факультет, группа и выход из кабинета." /> },
+    ],
+  },
+  {
+    path: '/staff',
+    element: <AppShell role="Staff" />,
+    children: [
+      { index: true, element: <Navigate to="/staff/requests" replace /> },
+      { path: 'requests', element: <StubPage title="Заявки" text="Очередь заявок студентов с фильтром по статусу." /> },
+      { path: 'schedule', element: <StubPage title="Расписание" text="Расписание групп, переносы и отмены пар." /> },
+      { path: 'announcements', element: <StubPage title="Объявления" text="Объявления для всех, факультета или группы." /> },
+      { path: 'notifications', element: <StubPage title="Уведомления" text="Новые заявки и ответы студентов." /> },
+      { path: 'profile', element: <StubPage title="Профиль" text="Должность, подразделение и выход из кабинета." /> },
+    ],
+  },
   ...devRoutes,
   { path: '*', element: <NotFoundPage /> },
 ];
