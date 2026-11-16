@@ -8,9 +8,22 @@ namespace Dekanat.IntegrationTests.Errors
     public sealed class ApiErrorTests( DekanatApiFactory factory )
     {
         [Fact]
+        public async Task UnknownApiRouteRequiresLoginFirst()
+        {
+            HttpClient client = factory.CreateBrowser();
+
+            HttpResponseMessage response = await client.GetAsync( "/api/no-such-route", TestContext.Current.CancellationToken );
+
+            // Без входа не подсказываем даже, какие адреса существуют.
+            Assert.Equal( HttpStatusCode.Unauthorized, response.StatusCode );
+            using Problem problem = await Problem.ReadAsync( response );
+            Assert.Equal( "Нужно войти в кабинет", problem.Title );
+        }
+
+        [Fact]
         public async Task UnknownApiRouteReturnsRussianProblemDetails()
         {
-            HttpClient client = factory.CreateClient();
+            (_, HttpClient client) = await factory.SignedInAsync();
 
             HttpResponseMessage response = await client.GetAsync( "/api/no-such-route", TestContext.Current.CancellationToken );
 
@@ -24,7 +37,7 @@ namespace Dekanat.IntegrationTests.Errors
         [Fact]
         public async Task WrongMethodReturnsRussianProblemDetails()
         {
-            HttpClient client = factory.CreateClient();
+            (_, HttpClient client) = await factory.SignedInAsync();
 
             HttpResponseMessage response = await client.DeleteAsync( "/api/health", TestContext.Current.CancellationToken );
 
@@ -36,7 +49,7 @@ namespace Dekanat.IntegrationTests.Errors
         [Fact]
         public async Task EverySuccessfulResponseHasItsOwnRequestId()
         {
-            HttpClient client = factory.CreateClient();
+            HttpClient client = factory.CreateBrowser();
 
             HttpResponseMessage first = await client.GetAsync( "/api/health", TestContext.Current.CancellationToken );
             HttpResponseMessage second = await client.GetAsync( "/api/health", TestContext.Current.CancellationToken );

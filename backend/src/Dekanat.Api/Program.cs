@@ -12,15 +12,19 @@ builder.Services.AddDekanatOpenApi();
 builder.Services.AddHealthChecks();
 builder.Services.AddDatabase();
 builder.Services.AddDekanatIdentity();
+builder.Services.AddDekanatSession();
 builder.Services.ConfigureHttpJsonOptions( options =>
     options.SerializerOptions.Converters.Add( new JsonStringEnumConverter() ) );
 
 WebApplication app = builder.Build();
 
+app.UseForwardedHeaders();
 app.UseErrorHandling();
+app.UseDekanatSession();
 
 RouteGroupBuilder api = app.MapGroup( "/api" ).WithProblemResponses();
 api.MapHealth();
+api.MapAuth();
 
 if ( !OpenApiSetup.IsGeneratingDocument )
 {

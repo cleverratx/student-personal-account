@@ -34,9 +34,6 @@ namespace Dekanat.Api.Features.Auth
                 .AddErrorDescriber<RussianIdentityErrorDescriber>()
                 .AddSignInManager();
 
-            // SignInManager нужен провайдер схем входа. Сами cookie сессии настраиваются вместе со входом.
-            services.AddAuthentication();
-
             return services;
         }
     }
