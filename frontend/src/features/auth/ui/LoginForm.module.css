@@ -1,0 +1,26 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.formError {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  padding: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: var(--leading-sm);
+  color: var(--color-danger-text);
+  background: var(--color-danger-soft);
+  border-radius: var(--radius-sm);
+}
+
+.formError svg {
+  margin-top: 2px;
+}
+
+.timer {
+  font-variant-numeric: tabular-nums;
+}

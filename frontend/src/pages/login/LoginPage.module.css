@@ -1,0 +1,32 @@
+.page {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: var(--space-6) var(--screen-pad);
+}
+
+.login {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 400px;
+}
+
+.title {
+  margin-top: var(--space-6);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: var(--leading-xl);
+  letter-spacing: -0.01em;
+}
+
+.title:focus {
+  outline: none;
+}
+
+.lead {
+  margin-top: var(--space-2);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
