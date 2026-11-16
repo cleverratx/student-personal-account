@@ -6,6 +6,13 @@
     <meta name="description" content="Личный кабинет студента. Концепт для MGIMO AI Challenge, не официальный сервис вуза." />
     <meta name="theme-color" content="#F6F7F9" />
     <title>Цифровой деканат</title>
+    <script>
+      // Тема из профиля применяется до первой отрисовки, чтобы страница не мигала светлой.
+      try {
+        var theme = localStorage.getItem('dekanat-theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
