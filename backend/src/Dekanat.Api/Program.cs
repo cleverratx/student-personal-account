@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Dekanat.Api.Features.Auth;
 using Dekanat.Api.Infrastructure.Errors;
 using Dekanat.Api.Infrastructure.Health;
 using Dekanat.Api.Infrastructure.OpenApi;
@@ -10,6 +11,7 @@ builder.Services.AddErrorHandling();
 builder.Services.AddDekanatOpenApi();
 builder.Services.AddHealthChecks();
 builder.Services.AddDatabase();
+builder.Services.AddDekanatIdentity();
 builder.Services.ConfigureHttpJsonOptions( options =>
     options.SerializerOptions.Converters.Add( new JsonStringEnumConverter() ) );
 
