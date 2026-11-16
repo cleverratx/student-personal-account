@@ -16,7 +16,7 @@ function formatTimer(seconds: number) {
   return `${minutes}:${String(seconds % 60).padStart(2, '0')}`;
 }
 
-export function LoginForm({ onSuccess }: { onSuccess: (result: LoginResponse) => void }) {
+export function LoginForm({ onSuccess }: { onSuccess?: (result: LoginResponse) => void }) {
   const login = useLogin();
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<{ message: string; locked: boolean } | null>(null);
@@ -50,7 +50,7 @@ export function LoginForm({ onSuccess }: { onSuccess: (result: LoginResponse) =>
     }
 
     login.mutate(values, {
-      onSuccess,
+      onSuccess: (result) => onSuccess?.(result),
       onError: (error) => {
         const failure = describeLoginError(error);
         if (failure.kind === 'fields') {

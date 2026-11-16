@@ -5,7 +5,8 @@ export function mockFetch(routes: Record<string, Handler>) {
   const calls: Request[] = [];
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const request = input instanceof Request ? input : new Request(input, init);
-    calls.push(request);
+    // Копия, чтобы тест мог прочитать тело, которое уже прочитал обработчик.
+    calls.push(request.clone());
     const key = `${request.method} ${new URL(request.url).pathname}`;
     const handler = routes[key];
     if (!handler) throw new Error(`Неожиданный запрос ${key}`);
