@@ -1,5 +1,5 @@
 import { Eye, EyeOff } from 'lucide-react';
-import { useId, useState, type InputHTMLAttributes } from 'react';
+import { useId, useState, type InputHTMLAttributes, type Ref } from 'react';
 import { cx } from '@/shared/lib';
 import styles from './Field.module.css';
 import { describedIds } from './describedIds';
@@ -8,6 +8,7 @@ import { FieldShell, type FieldShellProps } from './FieldShell';
 export interface TextFieldProps extends FieldShellProps, Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> {
   /** Для пароля: кнопка «Показать пароль» внутри поля. */
   revealable?: boolean;
+  ref?: Ref<HTMLInputElement>;
 }
 
 export function TextField({ label, hint, error, optional, revealable, type = 'text', className, ...rest }: TextFieldProps) {
