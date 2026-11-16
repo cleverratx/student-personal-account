@@ -1,0 +1,67 @@
+.appbar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  min-height: var(--appbar-height);
+  padding-inline: var(--screen-pad);
+  margin-inline: calc(var(--screen-pad) * -1);
+  background: var(--color-bg);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.back {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-left: -10px;
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition);
+}
+
+.back:hover {
+  background: var(--color-neutral-soft);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-3);
+  align-items: baseline;
+  padding: var(--space-1) 0 var(--space-5);
+}
+
+.title {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: var(--leading-xl);
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.meta {
+  color: var(--color-text-secondary);
+}
+
+@media (min-width: 1024px) {
+  .appbar:not(:has(.back)) .actions {
+    display: none;
+  }
+
+  .appbar:not(:has(.back)) {
+    min-height: var(--space-6);
+  }
+
+  .head {
+    padding-bottom: var(--space-6);
+  }
+}
