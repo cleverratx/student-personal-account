@@ -1,0 +1,81 @@
+.state {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+}
+
+.state > svg {
+  margin-bottom: var(--space-1);
+  color: var(--color-text-secondary);
+}
+
+.error > svg {
+  color: var(--color-danger);
+}
+
+.title {
+  font-weight: 600;
+}
+
+.text {
+  max-width: 36ch;
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.action {
+  margin-top: var(--space-3);
+}
+
+.empty {
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding-top: var(--space-2);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.bone {
+  display: block;
+  height: 16px;
+  background: var(--color-neutral-soft);
+  border-radius: var(--radius-sm);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.boneTitle {
+  width: 40%;
+  height: 20px;
+}
+
+.boneBlock {
+  height: 132px;
+  border-radius: var(--radius-md);
+}
+
+.boneRow {
+  height: 64px;
+  border-radius: var(--radius-md);
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
+}

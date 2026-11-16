@@ -1,0 +1,15 @@
+.note {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  padding: var(--space-3);
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+  color: var(--color-neutral-text);
+  background: var(--color-neutral-soft);
+  border-radius: var(--radius-sm);
+}
+
+.note svg {
+  margin-top: 2px;
+}

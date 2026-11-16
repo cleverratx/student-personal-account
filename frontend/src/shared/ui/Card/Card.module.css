@@ -1,0 +1,19 @@
+.card {
+  display: block;
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.link {
+  transition: border-color var(--transition);
+}
+
+.link:hover {
+  border-color: var(--color-border-strong);
+}
+
+.raised {
+  box-shadow: var(--shadow-card);
+}

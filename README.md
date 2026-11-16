@@ -127,7 +127,7 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-Пока в compose только база и API. Проверить, что всё живо, можно так: `curl http://localhost:8080/api/health` должен вернуть `{"status":"Healthy","checks":{"database":"Healthy"}}`. Миграции базы применяются сами при старте API.
+Кабинет откроется на http://localhost:8080: nginx отдаёт фронт и проксирует `/api` в API. Проверить бэкенд можно так: `curl http://localhost:8080/api/health` должен вернуть `{"status":"Healthy","checks":{"database":"Healthy"}}`. Миграции базы применяются сами при старте API. Чтобы появились демо-учётные записи, задайте `DEMO_PASSWORD` в `.env`.
 
 ### Бэкенд без Docker
 
