@@ -1,9 +1,13 @@
+export { Avatar } from './Avatar/Avatar';
 export { Badge, type BadgeTone } from './Badge/Badge';
+export { BottomNav, type NavItem } from './BottomNav/BottomNav';
+export { Brand } from './Brand/Brand';
 export { Button, ButtonLink, type ButtonProps, type ButtonVariant } from './Button/Button';
 export { Card, CardLink } from './Card/Card';
+export { ConceptNote } from './ConceptNote/ConceptNote';
 export { Select } from './Field/Select';
 export { TextField } from './Field/TextField';
-export { Header } from './Header/Header';
+export { Header, type HeaderProps } from './Header/Header';
 export { IconButton, IconLink } from './IconButton/IconButton';
 export { SegmentedControl, type SegmentedOption } from './SegmentedControl/SegmentedControl';
 export { Sheet } from './Sheet/Sheet';

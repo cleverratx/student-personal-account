@@ -85,6 +85,13 @@
   --transition: 150ms ease-out;
 }
 
+/* На компьютере у экрана поля шире. */
+@media (min-width: 1024px) {
+  :root {
+    --screen-pad: 32px;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
   color-scheme: dark;
