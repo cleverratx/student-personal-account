@@ -1,3 +1,4 @@
+using Dekanat.Api.Features.Auth;
 using Dekanat.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -31,6 +32,9 @@ namespace Dekanat.IntegrationTests
         protected override void ConfigureWebHost( IWebHostBuilder builder )
         {
             builder.UseSetting( $"ConnectionStrings:{DatabaseSetup.ConnectionStringName}", ConnectionString );
+            // Тесты логинятся часто и все с одного «адреса», поэтому лимит частоты здесь высокий.
+            // Сам лимит проверяет отдельный тест с маленьким значением.
+            builder.UseSetting( $"{AuthRateLimitOptions.Section}:PermitPerMinute", "10000" );
         }
 
         public override async ValueTask DisposeAsync()
