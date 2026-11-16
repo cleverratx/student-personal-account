@@ -8,9 +8,9 @@
 }
 
 .title {
-  font-size: 28px;
+  font-size: var(--text-xl);
   font-weight: 700;
-  line-height: 34px;
+  line-height: var(--leading-xl);
 }
 
 .note {
