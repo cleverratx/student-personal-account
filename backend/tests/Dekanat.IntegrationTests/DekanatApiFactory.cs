@@ -22,6 +22,10 @@ namespace Dekanat.IntegrationTests
         public async ValueTask InitializeAsync()
         {
             await _postgres.StartAsync();
+
+            // Поднимаем API здесь, один раз: тестовые классы идут параллельно, и без этого первые из них
+            // запускали сервер одновременно, а миграции применялись дважды.
+            _ = Services;
         }
 
         protected override void ConfigureWebHost( IWebHostBuilder builder )
