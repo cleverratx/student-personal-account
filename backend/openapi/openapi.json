@@ -88,6 +88,57 @@
         }
       }
     },
+    "/api/me/profile": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Профиль того, кто вошёл. Чей профиль, сервер берёт только из сессии",
+        "operationId": "GetMyProfile",
+        "responses": {
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/login": {
       "post": {
         "tags": [
@@ -370,6 +421,109 @@
           }
         }
       },
+      "ProfileResponse": {
+        "required": [
+          "role",
+          "login",
+          "fullName",
+          "initials",
+          "student",
+          "staff"
+        ],
+        "type": "object",
+        "properties": {
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          },
+          "login": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "initials": {
+            "type": "string"
+          },
+          "student": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/StudentProfileDto"
+              }
+            ]
+          },
+          "staff": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/StaffProfileDto"
+              }
+            ]
+          }
+        }
+      },
+      "StaffProfileDto": {
+        "required": [
+          "faculty",
+          "position",
+          "office"
+        ],
+        "type": "object",
+        "properties": {
+          "faculty": {
+            "type": "string"
+          },
+          "position": {
+            "type": "string"
+          },
+          "office": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "StudentProfileDto": {
+        "required": [
+          "faculty",
+          "programCode",
+          "programName",
+          "course",
+          "group",
+          "gradeBookNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "faculty": {
+            "type": "string"
+          },
+          "programCode": {
+            "type": "string"
+          },
+          "programName": {
+            "type": "string"
+          },
+          "course": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "group": {
+            "type": "string"
+          },
+          "gradeBookNumber": {
+            "type": "string"
+          }
+        }
+      },
       "UserRole": {
         "enum": [
           "Student",
@@ -384,6 +538,9 @@
     },
     {
       "name": "Auth"
+    },
+    {
+      "name": "Profile"
     }
   ]
 }
