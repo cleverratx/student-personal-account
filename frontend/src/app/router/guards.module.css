@@ -1,0 +1,5 @@
+.gate {
+  max-width: 720px;
+  padding: var(--space-6) var(--screen-pad);
+  margin-inline: auto;
+}

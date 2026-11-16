@@ -1,24 +1,13 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, render, screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createMemoryRouter, RouterProvider } from 'react-router';
-import { routes } from '@/app/router/routes';
-import { json, mockFetch } from './helpers/fetchMock';
+import { fakeBackend, PASSWORD } from './helpers/fakeBackend';
+import { json } from './helpers/fetchMock';
+import { renderApp } from './helpers/renderApp';
 
-function renderLogin(path = '/login') {
-  const router = createMemoryRouter(routes, { initialEntries: [path] });
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  render(
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>,
-  );
-  return router;
-}
-
-async function fillAndSubmit(login = 'a.ivanova', password = 'Correct-horse-1') {
+async function fillAndSubmit(login = 'a.ivanova', password = PASSWORD) {
   const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime.bind(vi) });
-  if (login) await user.type(await screen.findByLabelText('Логин'), login);
+  const loginField = await screen.findByLabelText('Логин');
+  if (login) await user.type(loginField, login);
   if (password) await user.type(screen.getByLabelText('Пароль'), password);
   await user.click(screen.getByRole('button', { name: /Войти/ }));
   return user;
@@ -36,7 +25,8 @@ afterEach(() => {
 
 describe('экран входа', () => {
   it('подсказывает менеджеру паролей поля и показывает пометку «концепт»', async () => {
-    renderLogin();
+    fakeBackend();
+    renderApp('/login');
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Вход в кабинет' })).toBeInTheDocument();
     expect(screen.getByLabelText('Логин')).toHaveAttribute('autocomplete', 'username');
@@ -45,30 +35,32 @@ describe('экран входа', () => {
   });
 
   it('пустую форму не отправляет и подсвечивает поля', async () => {
-    const { fetchMock } = mockFetch({});
-    renderLogin();
+    const { calls } = fakeBackend();
+    renderApp('/login');
 
     await fillAndSubmit('', '');
 
     expect(screen.getByLabelText('Логин')).toHaveAccessibleDescription('Введите логин');
     expect(screen.getByLabelText('Пароль')).toHaveAccessibleDescription('Введите пароль');
     expect(screen.getByLabelText('Логин')).toHaveFocus();
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(calls.filter((request) => request.method === 'POST')).toHaveLength(0);
   });
 
   it('студента после входа ведёт на «Сегодня»', async () => {
-    const { calls } = mockFetch({ 'POST /api/auth/login': () => json(200, { role: 'Student' }) });
-    const router = renderLogin();
+    const { calls } = fakeBackend();
+    const { router } = renderApp('/login');
 
     await fillAndSubmit(' a.ivanova ');
 
-    await vi.waitFor(() => expect(router.state.location.pathname).toBe('/today'));
-    expect(await calls[0]!.json()).toEqual({ login: 'a.ivanova', password: 'Correct-horse-1' });
+    expect(await screen.findByRole('heading', { level: 1, name: 'Сегодня' })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/today');
+    const login = calls.find((request) => request.method === 'POST')!;
+    expect(await login.json()).toEqual({ login: 'a.ivanova', password: PASSWORD });
   });
 
   it('сотрудника ведёт в очередь заявок', async () => {
-    mockFetch({ 'POST /api/auth/login': () => json(200, { role: 'Staff' }) });
-    const router = renderLogin();
+    fakeBackend();
+    const { router } = renderApp('/login');
 
     await fillAndSubmit('o.krylova');
 
@@ -76,8 +68,8 @@ describe('экран входа', () => {
   });
 
   it('возвращает на страницу из returnTo, но только внутри сайта', async () => {
-    mockFetch({ 'POST /api/auth/login': () => json(200, { role: 'Student' }) });
-    const router = renderLogin('/login?returnTo=%2Frequests%3Ftab%3Ddone');
+    fakeBackend();
+    const { router } = renderApp('/login?returnTo=%2Frequests%3Ftab%3Ddone');
 
     await fillAndSubmit();
 
@@ -86,8 +78,8 @@ describe('экран входа', () => {
   });
 
   it('не уводит на чужой сайт через returnTo', async () => {
-    mockFetch({ 'POST /api/auth/login': () => json(200, { role: 'Student' }) });
-    const router = renderLogin('/login?returnTo=%2F%2Fevil.example%2Fphish');
+    fakeBackend();
+    const { router } = renderApp('/login?returnTo=%2F%2Fevil.example%2Fphish');
 
     await fillAndSubmit();
 
@@ -95,24 +87,23 @@ describe('экран входа', () => {
   });
 
   it('на неверный пароль говорит об этом и не пускает дальше', async () => {
-    mockFetch({
-      'POST /api/auth/login': () =>
-        json(401, { type: 'https://dekanat.local/errors/invalid-credentials', title: 'Не удалось войти', status: 401, detail: 'Неверный логин или пароль.' }),
-    });
-    const router = renderLogin();
+    fakeBackend();
+    const { router } = renderApp('/login');
 
-    await fillAndSubmit();
+    await fillAndSubmit('a.ivanova', 'wrong-password-1');
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Неверный логин или пароль.');
     expect(router.state.location.pathname).toBe('/login');
   });
 
   it('при блокировке говорит, сколько ждать, и не даёт нажать «Войти» до конца', async () => {
-    mockFetch({
-      'POST /api/auth/login': () =>
-        json(429, { title: 'Слишком много попыток входа', status: 429, retryAfterSeconds: 300 }, { 'Retry-After': '300' }),
+    fakeBackend({
+      overrides: {
+        'POST /api/auth/login': () =>
+          json(429, { title: 'Слишком много попыток входа', status: 429, retryAfterSeconds: 300 }, { 'Retry-After': '300' }),
+      },
     });
-    renderLogin();
+    renderApp('/login');
 
     await fillAndSubmit();
 
@@ -129,9 +120,9 @@ describe('экран входа', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
-  it('без сети просит проверить интернет', async () => {
+  it('без сети показывает вход и просит проверить интернет', async () => {
     vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new TypeError('Failed to fetch'))));
-    renderLogin();
+    renderApp('/login');
 
     await fillAndSubmit();
 
@@ -139,10 +130,12 @@ describe('экран входа', () => {
   });
 
   it('показывает ошибки полей от сервера', async () => {
-    mockFetch({
-      'POST /api/auth/login': () => json(400, { title: 'Проверьте поля', status: 400, errors: { password: ['Пароль не длиннее 128 символов'] } }),
+    fakeBackend({
+      overrides: {
+        'POST /api/auth/login': () => json(400, { title: 'Проверьте поля', status: 400, errors: { password: ['Пароль не длиннее 128 символов'] } }),
+      },
     });
-    renderLogin();
+    renderApp('/login');
 
     await fillAndSubmit();
 
@@ -152,15 +145,18 @@ describe('экран входа', () => {
 
   it('пока идёт запрос, кнопка занята и второй раз не отправляет', async () => {
     let release: (response: Response) => void = () => {};
-    const { fetchMock } = mockFetch({ 'POST /api/auth/login': () => new Promise<Response>((resolve) => (release = resolve)) });
-    renderLogin();
+    const { calls } = fakeBackend({
+      overrides: { 'POST /api/auth/login': () => new Promise<Response>((resolve) => (release = resolve)) },
+    });
+    renderApp('/login');
 
     const user = await fillAndSubmit();
     const button = screen.getByRole('button', { name: 'Войти' });
     expect(button).toHaveAttribute('aria-busy', 'true');
     await user.click(button);
-    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(calls.filter((request) => request.method === 'POST')).toHaveLength(1);
 
-    release(json(200, { role: 'Student' }));
+    release(json(401, { title: 'Не удалось войти', status: 401 }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Неверный логин или пароль.');
   });
 });
