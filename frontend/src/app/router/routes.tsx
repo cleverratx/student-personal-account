@@ -1,4 +1,5 @@
 import { Navigate, type RouteObject } from 'react-router';
+import { LoginPage } from '@/pages/login';
 import { NotFoundPage } from '@/pages/not-found';
 import { StubPage } from '@/pages/stub';
 import { AppShell } from '@/widgets/app-shell';
@@ -19,6 +20,7 @@ const devRoutes: RouteObject[] = import.meta.env.DEV
 
 export const routes: RouteObject[] = [
   { path: '/', element: <Navigate to="/today" replace /> },
+  { path: '/login', element: <LoginPage /> },
   {
     element: <AppShell role="Student" />,
     children: [
