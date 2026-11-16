@@ -117,13 +117,24 @@ HTTP/1.1 204 No Content
 
 ### `GET /api/me`
 
-Возвращает профиль текущего пользователя. Для студента данные берутся из `StudentProfile`, для сотрудника из `StaffProfile`.
+Кто сейчас вошёл. Нужен фронту для проверки сессии и выбора набора разделов по роли. Без входа отвечает 401.
 
-**Запрос**
+**Ответ 200**
 
 ```http
-GET /api/me
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "id": "3f6c2b7e-8d1a-4f6b-9c2e-1b7f8a2d4c10",
+  "login": "a.ivanova",
+  "role": "Student"
+}
 ```
+
+### `GET /api/me/profile`
+
+Профиль того, кто вошёл. Чей профиль, сервер берёт только из сессии: параметры в запросе не читаются. Для студента заполнен `student`, для сотрудника `staff`, второе поле `null`. Если профиль ещё не заведён, ответ 404.
 
 **Ответ 200, студент**
 
@@ -132,14 +143,19 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "id": "3f6c2b7e-8d1a-4f6b-9c2e-1b7f8a2d4c10",
   "role": "Student",
-  "fullName": "Иванова Настя",
-  "faculty": "Факультет информатики",
-  "program": "Программная инженерия",
-  "course": 1,
-  "group": "ПИ-21",
-  "gradeBookNumber": "2026-0123"
+  "login": "a.ivanova",
+  "fullName": "Иванова Анастасия Сергеевна",
+  "initials": "АИ",
+  "student": {
+    "faculty": "Факультет информатики",
+    "programCode": "09.03.04",
+    "programName": "Программная инженерия",
+    "course": 1,
+    "group": "ПИ-21",
+    "gradeBookNumber": "2026-0123"
+  },
+  "staff": null
 }
 ```
 
@@ -150,10 +166,16 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "id": "8a4b1c2d-9e3f-4a5b-8c6d-7e1f2a3b4c5d",
   "role": "Staff",
-  "fullName": "Петрова Ольга",
-  "faculty": "Факультет информатики"
+  "login": "o.krylova",
+  "fullName": "Крылова Ольга Сергеевна",
+  "initials": "ОК",
+  "student": null,
+  "staff": {
+    "faculty": "Факультет информатики",
+    "position": "Специалист деканата",
+    "office": "204"
+  }
 }
 ```
 

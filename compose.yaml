@@ -30,6 +30,8 @@ services:
         condition: service_healthy
     environment:
       ConnectionStrings__Default: "Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+      # Если задан, при старте создаются демо-учётные записи с этим паролем. Пустой значит без демо-данных.
+      Demo__Password: ${DEMO_PASSWORD:-}
     ports:
       # Пока в compose нет nginx с фронтом, API доступен на этой машине напрямую: http://localhost:8080/api/health.
       # Когда появится сервис web, порт перейдёт к нему, а API останется только внутри сети compose.
