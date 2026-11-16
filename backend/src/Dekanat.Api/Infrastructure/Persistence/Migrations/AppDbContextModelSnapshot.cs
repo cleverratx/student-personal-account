@@ -103,6 +103,188 @@ namespace Dekanat.Api.Infrastructure.Persistence.Migrations
                     b.ToTable("users", (string)null);
                 });
 
+            modelBuilder.Entity("Dekanat.Api.Features.Profile.Faculty", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_faculties");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_faculties_name");
+
+                    b.ToTable("faculties", (string)null);
+                });
+
+            modelBuilder.Entity("Dekanat.Api.Features.Profile.StaffProfile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("FacultyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("faculty_id");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("full_name");
+
+                    b.Property<string>("Office")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("office");
+
+                    b.Property<string>("Position")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("position");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_staff_profiles");
+
+                    b.HasIndex("FacultyId")
+                        .HasDatabaseName("ix_staff_profiles_faculty_id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_staff_profiles_user_id");
+
+                    b.ToTable("staff_profiles", (string)null);
+                });
+
+            modelBuilder.Entity("Dekanat.Api.Features.Profile.StudentProfile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("full_name");
+
+                    b.Property<string>("GradeBookNumber")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("grade_book_number");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("group_id");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_student_profiles");
+
+                    b.HasIndex("GradeBookNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_student_profiles_grade_book_number");
+
+                    b.HasIndex("GroupId")
+                        .HasDatabaseName("ix_student_profiles_group_id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_student_profiles_user_id");
+
+                    b.ToTable("student_profiles", (string)null);
+                });
+
+            modelBuilder.Entity("Dekanat.Api.Features.Profile.StudyGroup", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("Course")
+                        .HasColumnType("integer")
+                        .HasColumnName("course");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("ProgramId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("program_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_groups");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_groups_name");
+
+                    b.HasIndex("ProgramId")
+                        .HasDatabaseName("ix_groups_program_id");
+
+                    b.ToTable("groups", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_groups_course", "course BETWEEN 1 AND 6");
+                        });
+                });
+
+            modelBuilder.Entity("Dekanat.Api.Features.Profile.StudyProgram", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("code");
+
+                    b.Property<Guid>("FacultyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("faculty_id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_programs");
+
+                    b.HasIndex("FacultyId", "Code")
+                        .IsUnique()
+                        .HasDatabaseName("ix_programs_faculty_id_code");
+
+                    b.ToTable("programs", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
                 {
                     b.Property<int>("Id")
@@ -302,6 +484,68 @@ namespace Dekanat.Api.Infrastructure.Persistence.Migrations
                         .HasName("pk_user_tokens");
 
                     b.ToTable("user_tokens", (string)null);
+                });
+
+            modelBuilder.Entity("Dekanat.Api.Features.Profile.StaffProfile", b =>
+                {
+                    b.HasOne("Dekanat.Api.Features.Profile.Faculty", "Faculty")
+                        .WithMany()
+                        .HasForeignKey("FacultyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_staff_profiles_faculties_faculty_id");
+
+                    b.HasOne("Dekanat.Api.Features.Auth.AppUser", null)
+                        .WithOne()
+                        .HasForeignKey("Dekanat.Api.Features.Profile.StaffProfile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_staff_profiles_users_user_id");
+
+                    b.Navigation("Faculty");
+                });
+
+            modelBuilder.Entity("Dekanat.Api.Features.Profile.StudentProfile", b =>
+                {
+                    b.HasOne("Dekanat.Api.Features.Profile.StudyGroup", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_student_profiles_groups_group_id");
+
+                    b.HasOne("Dekanat.Api.Features.Auth.AppUser", null)
+                        .WithOne()
+                        .HasForeignKey("Dekanat.Api.Features.Profile.StudentProfile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_student_profiles_users_user_id");
+
+                    b.Navigation("Group");
+                });
+
+            modelBuilder.Entity("Dekanat.Api.Features.Profile.StudyGroup", b =>
+                {
+                    b.HasOne("Dekanat.Api.Features.Profile.StudyProgram", "Program")
+                        .WithMany()
+                        .HasForeignKey("ProgramId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_groups_programs_program_id");
+
+                    b.Navigation("Program");
+                });
+
+            modelBuilder.Entity("Dekanat.Api.Features.Profile.StudyProgram", b =>
+                {
+                    b.HasOne("Dekanat.Api.Features.Profile.Faculty", "Faculty")
+                        .WithMany()
+                        .HasForeignKey("FacultyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_programs_faculties_faculty_id");
+
+                    b.Navigation("Faculty");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
