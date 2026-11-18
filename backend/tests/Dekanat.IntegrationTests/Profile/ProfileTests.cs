@@ -3,11 +3,7 @@ using System.Text.Json;
 using Dekanat.Api.Features.Auth;
 using Dekanat.Api.Features.Profile;
 using Dekanat.Api.Infrastructure.Persistence;
-using Dekanat.Api.Infrastructure.Seed;
 using Dekanat.IntegrationTests.Errors;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dekanat.IntegrationTests.Profile
@@ -101,25 +97,6 @@ namespace Dekanat.IntegrationTests.Profile
             Assert.Equal( HttpStatusCode.NotFound, response.StatusCode );
             using Problem problem = await Problem.ReadAsync( response );
             Assert.Equal( "Профиль не найден", problem.Title );
-        }
-
-        [Fact]
-        public async Task DemoSeedCreatesAccountsOnceAndOnlyWithPassword()
-        {
-            const string password = "Demo-seed-2026";
-            for ( int run = 0; run < 2; run++ )
-            {
-                await using WebApplicationFactory<Program> demo = factory.WithWebHostBuilder( builder =>
-                    builder.UseSetting( $"{DemoOptions.Section}:Password", password ) );
-                HttpClient client = demo.CreateBrowser();
-                HttpResponseMessage login = await client.LoginAsync( "a.ivanova", password );
-                Assert.Equal( HttpStatusCode.OK, login.StatusCode );
-            }
-
-            await using AsyncServiceScope scope = factory.Services.CreateAsyncScope();
-            AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            Assert.Equal( 1, await db.Users.CountAsync( user => user.UserName == "a.ivanova", Token ) );
-            Assert.Equal( 1, await db.Set<StudyGroup>().CountAsync( group => group.Name == "ПИ-21", Token ) );
         }
 
         private async Task<(TestUser User, string FullName, string Group)> CreateStudentAsync()

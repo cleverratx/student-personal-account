@@ -1,0 +1,111 @@
+.row {
+  display: grid;
+  grid-template-areas:
+    'time main'
+    'change change';
+  grid-template-columns: 52px minmax(0, 1fr);
+  column-gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+
+.now {
+  background: var(--color-today);
+  box-shadow: inset 3px 0 0 var(--color-primary);
+}
+
+.time {
+  display: flex;
+  flex-direction: column;
+  grid-area: time;
+  font-variant-numeric: tabular-nums;
+}
+
+.time span:first-child {
+  font-weight: 600;
+}
+
+.time span + span {
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+  color: var(--color-text-secondary);
+}
+
+.main {
+  grid-area: main;
+  min-width: 0;
+}
+
+.title {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+  color: var(--color-text-secondary);
+}
+
+.status {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: var(--leading-sm);
+  color: var(--color-link);
+}
+
+.past .title,
+.past .time span:first-child {
+  color: var(--color-text-secondary);
+}
+
+.cancelled .title {
+  color: var(--color-text-secondary);
+  text-decoration: line-through;
+}
+
+.change {
+  display: flex;
+  grid-area: change;
+  gap: var(--space-2);
+  align-items: flex-start;
+  padding: var(--space-2) var(--space-3);
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+  color: var(--color-warning);
+  background: var(--color-warning-soft);
+  border-radius: var(--radius-sm);
+}
+
+.change svg {
+  margin-top: 2px;
+}
+
+.changeText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.changeWhat {
+  font-weight: 600;
+}
+
+.change s {
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+.reason {
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.changeCancelled {
+  color: var(--color-danger-text);
+  background: var(--color-danger-soft);
+}

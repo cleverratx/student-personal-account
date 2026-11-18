@@ -70,6 +70,12 @@ export function fakeBackend({ session = null as Role | null, overrides = {} as R
       return json(200, { id: user.id, login: user.login, role: state.session });
     },
     'GET /api/me/profile': () => (state.session ? json(200, USERS[state.session].profile) : unauthorized()),
+    // Пустая неделя: экраны, которым расписание не важно, не должны падать на этом запросе.
+    'GET /api/schedule': (request) => {
+      if (!state.session) return unauthorized();
+      const query = new URL(request.url).searchParams;
+      return json(200, { from: query.get('from'), to: query.get('to'), timeZone: 'Europe/Moscow', group: 'ПИ-21', items: [] });
+    },
     ...overrides,
   };
 
