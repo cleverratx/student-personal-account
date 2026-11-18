@@ -285,6 +285,189 @@ namespace Dekanat.Api.Infrastructure.Persistence.Migrations
                     b.ToTable("programs", (string)null);
                 });
 
+            modelBuilder.Entity("Dekanat.Api.Features.Schedule.Discipline", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_disciplines");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_disciplines_name");
+
+                    b.ToTable("disciplines", (string)null);
+                });
+
+            modelBuilder.Entity("Dekanat.Api.Features.Schedule.Lesson", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("DisciplineId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("discipline_id");
+
+                    b.Property<DateTime>("EndsAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("ends_at");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("group_id");
+
+                    b.Property<bool>("IsCancelled")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_cancelled");
+
+                    b.Property<string>("Room")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("room");
+
+                    b.Property<DateTime>("StartsAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("starts_at");
+
+                    b.Property<Guid>("TeacherId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("teacher_id");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_lessons");
+
+                    b.HasIndex("DisciplineId")
+                        .HasDatabaseName("ix_lessons_discipline_id");
+
+                    b.HasIndex("GroupId", "StartsAt")
+                        .HasDatabaseName("ix_lessons_group_id_starts_at");
+
+                    b.HasIndex("Room", "StartsAt")
+                        .HasDatabaseName("ix_lessons_room_starts_at");
+
+                    b.HasIndex("TeacherId", "StartsAt")
+                        .HasDatabaseName("ix_lessons_teacher_id_starts_at");
+
+                    b.ToTable("lessons", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_lessons_ends_after_starts", "ends_at > starts_at");
+
+                            t.HasCheckConstraint("ck_lessons_type", "type IN ('Lecture', 'Practice', 'Lab', 'Consultation', 'Exam', 'Credit', 'GradedCredit')");
+                        });
+                });
+
+            modelBuilder.Entity("Dekanat.Api.Features.Schedule.LessonChange", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("ChangedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("changed_at");
+
+                    b.Property<Guid?>("ChangedByUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("changed_by_user_id");
+
+                    b.Property<Guid>("LessonId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("lesson_id");
+
+                    b.Property<string>("NewRoom")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("new_room");
+
+                    b.Property<DateTime?>("NewStartsAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("new_starts_at");
+
+                    b.Property<string>("OldRoom")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("old_room");
+
+                    b.Property<DateTime?>("OldStartsAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("old_starts_at");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("reason");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_lesson_changes");
+
+                    b.HasIndex("ChangedByUserId")
+                        .HasDatabaseName("ix_lesson_changes_changed_by_user_id");
+
+                    b.HasIndex("LessonId", "ChangedAt")
+                        .HasDatabaseName("ix_lesson_changes_lesson_id_changed_at");
+
+                    b.ToTable("lesson_changes", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_lesson_changes_type", "type IN ('Reschedule', 'RoomChange', 'Cancellation')");
+                        });
+                });
+
+            modelBuilder.Entity("Dekanat.Api.Features.Schedule.Teacher", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Department")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("department");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("full_name");
+
+                    b.Property<string>("Position")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("position");
+
+                    b.HasKey("Id")
+                        .HasName("pk_teachers");
+
+                    b.ToTable("teachers", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
                 {
                     b.Property<int>("Id")
@@ -548,6 +731,52 @@ namespace Dekanat.Api.Infrastructure.Persistence.Migrations
                     b.Navigation("Faculty");
                 });
 
+            modelBuilder.Entity("Dekanat.Api.Features.Schedule.Lesson", b =>
+                {
+                    b.HasOne("Dekanat.Api.Features.Schedule.Discipline", "Discipline")
+                        .WithMany()
+                        .HasForeignKey("DisciplineId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_lessons_disciplines_discipline_id");
+
+                    b.HasOne("Dekanat.Api.Features.Profile.StudyGroup", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_lessons_groups_group_id");
+
+                    b.HasOne("Dekanat.Api.Features.Schedule.Teacher", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_lessons_teachers_teacher_id");
+
+                    b.Navigation("Discipline");
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("Dekanat.Api.Features.Schedule.LessonChange", b =>
+                {
+                    b.HasOne("Dekanat.Api.Features.Auth.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("ChangedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_lesson_changes_users_changed_by_user_id");
+
+                    b.HasOne("Dekanat.Api.Features.Schedule.Lesson", null)
+                        .WithMany("Changes")
+                        .HasForeignKey("LessonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_lesson_changes_lessons_lesson_id");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -603,6 +832,11 @@ namespace Dekanat.Api.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_tokens_users_user_id");
+                });
+
+            modelBuilder.Entity("Dekanat.Api.Features.Schedule.Lesson", b =>
+                {
+                    b.Navigation("Changes");
                 });
 #pragma warning restore 612, 618
         }

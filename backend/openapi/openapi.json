@@ -139,6 +139,95 @@
         }
       }
     },
+    "/api/schedule": {
+      "get": {
+        "tags": [
+          "Schedule"
+        ],
+        "summary": "Пары группы того, кто вошёл, за период. Группу сервер берёт только из сессии",
+        "operationId": "GetSchedule",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/login": {
       "post": {
         "tags": [
@@ -329,6 +418,130 @@
           }
         }
       },
+      "LessonChangeDto": {
+        "required": [
+          "type",
+          "oldStartsAt",
+          "newStartsAt",
+          "oldRoom",
+          "newRoom",
+          "reason",
+          "changedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/LessonChangeType"
+          },
+          "oldStartsAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "newStartsAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "oldRoom": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "newRoom": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "changedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "LessonChangeType": {
+        "enum": [
+          "Reschedule",
+          "RoomChange",
+          "Cancellation"
+        ]
+      },
+      "LessonDto": {
+        "required": [
+          "id",
+          "discipline",
+          "type",
+          "startsAt",
+          "endsAt",
+          "room",
+          "teacher",
+          "isCancelled",
+          "change"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "discipline": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/LessonType"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "room": {
+            "type": "string"
+          },
+          "teacher": {
+            "type": "string"
+          },
+          "isCancelled": {
+            "type": "boolean"
+          },
+          "change": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/LessonChangeDto"
+              }
+            ]
+          }
+        }
+      },
+      "LessonType": {
+        "enum": [
+          "Lecture",
+          "Practice",
+          "Lab",
+          "Consultation",
+          "Exam",
+          "Credit",
+          "GradedCredit"
+        ]
+      },
       "LoginRequest": {
         "required": [
           "login",
@@ -466,6 +679,38 @@
           }
         }
       },
+      "ScheduleResponse": {
+        "required": [
+          "from",
+          "to",
+          "timeZone",
+          "group",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date"
+          },
+          "to": {
+            "type": "string",
+            "format": "date"
+          },
+          "timeZone": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LessonDto"
+            }
+          }
+        }
+      },
       "StaffProfileDto": {
         "required": [
           "faculty",
@@ -541,6 +786,9 @@
     },
     {
       "name": "Profile"
+    },
+    {
+      "name": "Schedule"
     }
   ]
 }

@@ -127,7 +127,7 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-Кабинет откроется на http://localhost:8080: nginx отдаёт фронт и проксирует `/api` в API. Проверить бэкенд можно так: `curl http://localhost:8080/api/health` должен вернуть `{"status":"Healthy","checks":{"database":"Healthy"}}`. Миграции базы применяются сами при старте API. Чтобы появились демо-учётные записи, задайте `DEMO_PASSWORD` в `.env`.
+Кабинет откроется на http://localhost:8080: nginx отдаёт фронт и проксирует `/api` в API. Проверить бэкенд можно так: `curl http://localhost:8080/api/health` должен вернуть `{"status":"Healthy","checks":{"database":"Healthy"}}`. Миграции базы применяются сами при старте API. Чтобы включить демо-режим, задайте `DEMO_PASSWORD` в `.env`: при старте API появятся вымышленные студенты трёх групп, сотрудник деканата и расписание текущего семестра с переносами на ближайшие дни. Сид можно запускать сколько угодно раз, данные не задвоятся. Логины лежат в `backend/src/Dekanat.Api/Infrastructure/Seed/DemoData.cs`, пароль у всех из `DEMO_PASSWORD`.
 
 ### Бэкенд без Docker
 

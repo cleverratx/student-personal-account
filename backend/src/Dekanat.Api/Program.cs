@@ -1,11 +1,13 @@
 using System.Text.Json.Serialization;
 using Dekanat.Api.Features.Auth;
 using Dekanat.Api.Features.Profile;
+using Dekanat.Api.Features.Schedule;
 using Dekanat.Api.Infrastructure.Errors;
 using Dekanat.Api.Infrastructure.Health;
 using Dekanat.Api.Infrastructure.OpenApi;
 using Dekanat.Api.Infrastructure.Persistence;
 using Dekanat.Api.Infrastructure.Seed;
+using Dekanat.Api.Infrastructure.Time;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder( args );
 
@@ -15,6 +17,7 @@ builder.Services.AddHealthChecks();
 builder.Services.AddDatabase();
 builder.Services.AddDekanatIdentity();
 builder.Services.AddDekanatSession();
+builder.Services.AddUniversityTime();
 builder.Services.ConfigureHttpJsonOptions( options =>
     options.SerializerOptions.Converters.Add( new JsonStringEnumConverter() ) );
 
@@ -28,6 +31,7 @@ RouteGroupBuilder api = app.MapGroup( "/api" ).WithProblemResponses();
 api.MapHealth();
 api.MapAuth();
 api.MapProfile();
+api.MapSchedule();
 
 if ( !OpenApiSetup.IsGeneratingDocument )
 {
