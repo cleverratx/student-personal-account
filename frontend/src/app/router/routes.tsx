@@ -3,6 +3,7 @@ import { Navigate } from 'react-router';
 import { LoginPage } from '@/pages/login';
 import { NotFoundPage } from '@/pages/not-found';
 import { ProfilePage } from '@/pages/profile';
+import { SchedulePage } from '@/pages/schedule';
 import { StubPage } from '@/pages/stub';
 import { GuestOnly, RequireAuth, RootRedirect } from './guards';
 
@@ -34,7 +35,7 @@ export const routes: RouteObject[] = [
     element: <RequireAuth role="Student" />,
     children: [
       { path: '/today', element: <StubPage title="Сегодня" text="Следующая пара, ближайший срок, важные объявления и активные заявки." /> },
-      { path: '/schedule', element: <StubPage title="Расписание" text="Пары на день и неделю с аудиториями, переносами и отменами." /> },
+      { path: '/schedule', element: <SchedulePage /> },
       { path: '/grades', element: <StubPage title="Учёба" text="Допуск к сессии, долги и оценки по предметам." /> },
       { path: '/requests', element: <StubPage title="Заявки" text="Справки и заявления со статусами и примерной датой готовности." /> },
       { path: '/notifications', element: <StubPage title="Уведомления" text="Объявления, переносы пар и изменения статусов заявок." /> },

@@ -55,6 +55,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Пары группы того, кто вошёл, за период. Группу сервер берёт только из сессии */
+        get: operations["GetSchedule"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/login": {
         parameters: {
             query?: never;
@@ -112,6 +129,36 @@ export interface components {
                 [key: string]: string[];
             };
         };
+        LessonChangeDto: {
+            type: components["schemas"]["LessonChangeType"];
+            /** Format: date-time */
+            oldStartsAt: null | string;
+            /** Format: date-time */
+            newStartsAt: null | string;
+            oldRoom: null | string;
+            newRoom: null | string;
+            reason: null | string;
+            /** Format: date-time */
+            changedAt: string;
+        };
+        /** @enum {unknown} */
+        LessonChangeType: "Reschedule" | "RoomChange" | "Cancellation";
+        LessonDto: {
+            /** Format: uuid */
+            id: string;
+            discipline: string;
+            type: components["schemas"]["LessonType"];
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string;
+            room: string;
+            teacher: string;
+            isCancelled: boolean;
+            change: null | components["schemas"]["LessonChangeDto"];
+        };
+        /** @enum {unknown} */
+        LessonType: "Lecture" | "Practice" | "Lab" | "Consultation" | "Exam" | "Credit" | "GradedCredit";
         LoginRequest: {
             login: null | string;
             password: null | string;
@@ -140,6 +187,15 @@ export interface components {
             initials: string;
             student: null | components["schemas"]["StudentProfileDto"];
             staff: null | components["schemas"]["StaffProfileDto"];
+        };
+        ScheduleResponse: {
+            /** Format: date */
+            from: string;
+            /** Format: date */
+            to: string;
+            timeZone: string;
+            group: string;
+            items: components["schemas"]["LessonDto"][];
         };
         StaffProfileDto: {
             faculty: string;
@@ -262,6 +318,74 @@ export interface operations {
             };
             /** @description Unauthorized */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetSchedule: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScheduleResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };

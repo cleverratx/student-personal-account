@@ -1,0 +1,76 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bar {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.label {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  text-align: center;
+}
+
+.labelName {
+  font-weight: 600;
+}
+
+.labelDates {
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+  color: var(--color-text-secondary);
+}
+
+.swipe {
+  touch-action: pan-y;
+}
+
+.week {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dayHead {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  font-size: var(--text-md);
+  font-weight: 600;
+  line-height: var(--leading-md);
+}
+
+.pastDay .dayHead {
+  color: var(--color-text-secondary);
+}
+
+.todayTag {
+  padding: 0 var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: var(--leading-md);
+  color: var(--color-link);
+  background: var(--color-primary-soft);
+  border-radius: var(--radius-full);
+}
