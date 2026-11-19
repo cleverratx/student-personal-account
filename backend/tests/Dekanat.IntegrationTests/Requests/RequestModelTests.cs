@@ -86,7 +86,7 @@ namespace Dekanat.IntegrationTests.Requests
         {
             (Guid profileId, Guid userId) = await CreateStudentAsync();
             Request request = RequestWorkflow.Submit( profileId, userId, RequestTypes.All[ 0 ], "{}", DateTime.UtcNow, DateOnly.FromDateTime( DateTime.UtcNow ) );
-            request.CurrentStatus = ( RequestStatus ) 99;
+            request.CurrentStatus = ( RequestStatus )99;
 
             await using AsyncServiceScope scope = factory.Services.CreateAsyncScope();
             AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();

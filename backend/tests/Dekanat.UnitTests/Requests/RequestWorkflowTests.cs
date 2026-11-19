@@ -125,7 +125,7 @@ namespace Dekanat.UnitTests.Requests
             Assert.Equal(
                 new[] { RequestStatus.Submitted, RequestStatus.InProgress, RequestStatus.Ready, RequestStatus.Issued },
                 request.History.Select( entry => entry.Status ) );
-            Assert.Equal( new Guid?[] { StudentUser, StaffUser, StaffUser, StaffUser }, request.History.Select( entry => ( Guid? ) entry.ChangedByUserId ) );
+            Assert.Equal( new Guid?[] { StudentUser, StaffUser, StaffUser, StaffUser }, request.History.Select( entry => ( Guid? )entry.ChangedByUserId ) );
             Assert.Equal( new[] { Now, Now.AddHours( 1 ), Now.AddHours( 2 ), Now.AddHours( 3 ) }, request.History.Select( entry => entry.ChangedAt ) );
             Assert.Equal( "Передана в деканат", request.History[ 1 ].Comment );
             Assert.All( request.History, entry => Assert.Equal( request.Id, entry.RequestId ) );
