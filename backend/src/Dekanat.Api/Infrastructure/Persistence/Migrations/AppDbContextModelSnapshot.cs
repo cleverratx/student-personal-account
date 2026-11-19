@@ -285,6 +285,201 @@ namespace Dekanat.Api.Infrastructure.Persistence.Migrations
                     b.ToTable("programs", (string)null);
                 });
 
+            modelBuilder.Entity("Dekanat.Api.Features.Requests.Request", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("CurrentStatus")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("current_status");
+
+                    b.Property<DateOnly?>("EstimatedReadyDate")
+                        .HasColumnType("date")
+                        .HasColumnName("estimated_ready_date");
+
+                    b.Property<string>("Fields")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("fields");
+
+                    b.Property<DateTime?>("IssueDeadline")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("issue_deadline");
+
+                    b.Property<string>("IssuePlace")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("issue_place");
+
+                    b.Property<Guid>("RequestTypeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("request_type_id");
+
+                    b.Property<Guid>("StudentProfileId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("student_profile_id");
+
+                    b.Property<int>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer")
+                        .HasColumnName("version");
+
+                    b.HasKey("Id")
+                        .HasName("pk_requests");
+
+                    b.HasIndex("CurrentStatus", "CreatedAt")
+                        .HasDatabaseName("ix_requests_current_status_created_at");
+
+                    b.HasIndex("RequestTypeId")
+                        .HasDatabaseName("ix_requests_request_type_id");
+
+                    b.HasIndex("StudentProfileId", "CreatedAt")
+                        .IsDescending(false, true)
+                        .HasDatabaseName("ix_requests_student_profile_id_created_at");
+
+                    b.ToTable("requests", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_requests_current_status", "current_status IN ('Submitted', 'InProgress', 'Ready', 'Issued', 'Rejected', 'Cancelled')");
+                        });
+                });
+
+            modelBuilder.Entity("Dekanat.Api.Features.Requests.RequestStatusHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("ChangedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("changed_at");
+
+                    b.Property<Guid?>("ChangedByUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("changed_by_user_id");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("comment");
+
+                    b.Property<Guid>("RequestId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("request_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("status");
+
+                    b.HasKey("Id")
+                        .HasName("pk_request_status_history");
+
+                    b.HasIndex("ChangedByUserId")
+                        .HasDatabaseName("ix_request_status_history_changed_by_user_id");
+
+                    b.HasIndex("RequestId", "ChangedAt")
+                        .HasDatabaseName("ix_request_status_history_request_id_changed_at");
+
+                    b.ToTable("request_status_history", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_request_status_history_status", "status IN ('Submitted', 'InProgress', 'Ready', 'Issued', 'Rejected', 'Cancelled')");
+                        });
+                });
+
+            modelBuilder.Entity("Dekanat.Api.Features.Requests.RequestType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("FieldSchema")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("field_schema");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<int>("ProcessingDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("processing_days");
+
+                    b.HasKey("Id")
+                        .HasName("pk_request_types");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_request_types_name");
+
+                    b.ToTable("request_types", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_request_types_processing_days", "processing_days > 0");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("d7a1c3e5-4b2f-4a6d-9c8e-0f1a2b3c4d01"),
+                            Description = "Подтверждает, что вы учитесь в вузе",
+                            FieldSchema = "{\"destination\":{\"type\":\"string\",\"required\":true,\"title\":\"Куда предоставить\",\"maxLength\":200},\"copies\":{\"type\":\"integer\",\"required\":true,\"title\":\"Количество экземпляров\",\"min\":1,\"max\":5},\"delivery\":{\"type\":\"choice\",\"required\":true,\"title\":\"Как получить\",\"options\":[{\"value\":\"Electronic\",\"title\":\"Электронно\"},{\"value\":\"Deanery\",\"title\":\"В деканате\"}]},\"comment\":{\"type\":\"string\",\"required\":false,\"title\":\"Комментарий\",\"maxLength\":500}}",
+                            Name = "Справка об обучении",
+                            ProcessingDays = 3
+                        },
+                        new
+                        {
+                            Id = new Guid("d7a1c3e5-4b2f-4a6d-9c8e-0f1a2b3c4d02"),
+                            Description = "Справка для военного комиссариата",
+                            FieldSchema = "{\"destination\":{\"type\":\"string\",\"required\":true,\"title\":\"В какой военкомат\",\"maxLength\":200},\"copies\":{\"type\":\"integer\",\"required\":true,\"title\":\"Количество экземпляров\",\"min\":1,\"max\":5},\"delivery\":{\"type\":\"choice\",\"required\":true,\"title\":\"Как получить\",\"options\":[{\"value\":\"Electronic\",\"title\":\"Электронно\"},{\"value\":\"Deanery\",\"title\":\"В деканате\"}]},\"comment\":{\"type\":\"string\",\"required\":false,\"title\":\"Комментарий\",\"maxLength\":500}}",
+                            Name = "Справка в военкомат",
+                            ProcessingDays = 5
+                        },
+                        new
+                        {
+                            Id = new Guid("d7a1c3e5-4b2f-4a6d-9c8e-0f1a2b3c4d03"),
+                            Description = "Для органов соцзащиты или для назначения стипендии",
+                            FieldSchema = "{\"destination\":{\"type\":\"string\",\"required\":true,\"title\":\"Куда предоставить\",\"maxLength\":200},\"copies\":{\"type\":\"integer\",\"required\":true,\"title\":\"Количество экземпляров\",\"min\":1,\"max\":5},\"delivery\":{\"type\":\"choice\",\"required\":true,\"title\":\"Как получить\",\"options\":[{\"value\":\"Electronic\",\"title\":\"Электронно\"},{\"value\":\"Deanery\",\"title\":\"В деканате\"}]},\"comment\":{\"type\":\"string\",\"required\":false,\"title\":\"Комментарий\",\"maxLength\":500}}",
+                            Name = "Справка для соцзащиты или стипендии",
+                            ProcessingDays = 5
+                        },
+                        new
+                        {
+                            Id = new Guid("d7a1c3e5-4b2f-4a6d-9c8e-0f1a2b3c4d04"),
+                            Description = "Заявление на пересдачу дисциплины",
+                            FieldSchema = "{\"assessmentId\":{\"type\":\"uuid\",\"required\":true,\"title\":\"Дисциплина\"},\"comment\":{\"type\":\"string\",\"required\":false,\"title\":\"Комментарий\",\"maxLength\":500}}",
+                            Name = "Заявление на пересдачу",
+                            ProcessingDays = 2
+                        },
+                        new
+                        {
+                            Id = new Guid("d7a1c3e5-4b2f-4a6d-9c8e-0f1a2b3c4d05"),
+                            Description = "Заявление на академический отпуск",
+                            FieldSchema = "{\"reason\":{\"type\":\"choice\",\"required\":true,\"title\":\"Причина\",\"options\":[{\"value\":\"Health\",\"title\":\"По состоянию здоровья\"},{\"value\":\"Family\",\"title\":\"По семейным обстоятельствам\"},{\"value\":\"Other\",\"title\":\"Другая причина\"}]},\"startDate\":{\"type\":\"date\",\"required\":true,\"title\":\"С какой даты\"},\"durationMonths\":{\"type\":\"integer\",\"required\":true,\"title\":\"На сколько месяцев\",\"min\":1,\"max\":12},\"comment\":{\"type\":\"string\",\"required\":false,\"title\":\"Комментарий\",\"maxLength\":500}}",
+                            Name = "Заявление на академический отпуск",
+                            ProcessingDays = 10
+                        });
+                });
+
             modelBuilder.Entity("Dekanat.Api.Features.Schedule.Discipline", b =>
                 {
                     b.Property<Guid>("Id")
@@ -731,6 +926,43 @@ namespace Dekanat.Api.Infrastructure.Persistence.Migrations
                     b.Navigation("Faculty");
                 });
 
+            modelBuilder.Entity("Dekanat.Api.Features.Requests.Request", b =>
+                {
+                    b.HasOne("Dekanat.Api.Features.Profile.StudentProfile", "StudentProfile")
+                        .WithMany()
+                        .HasForeignKey("StudentProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_requests_student_profiles_student_profile_id");
+
+                    b.HasOne("Dekanat.Api.Features.Requests.RequestType", "Type")
+                        .WithMany()
+                        .HasForeignKey("RequestTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_requests_request_types_request_type_id");
+
+                    b.Navigation("StudentProfile");
+
+                    b.Navigation("Type");
+                });
+
+            modelBuilder.Entity("Dekanat.Api.Features.Requests.RequestStatusHistory", b =>
+                {
+                    b.HasOne("Dekanat.Api.Features.Auth.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("ChangedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_request_status_history_users_changed_by_user_id");
+
+                    b.HasOne("Dekanat.Api.Features.Requests.Request", null)
+                        .WithMany("History")
+                        .HasForeignKey("RequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_request_status_history_requests_request_id");
+                });
+
             modelBuilder.Entity("Dekanat.Api.Features.Schedule.Lesson", b =>
                 {
                     b.HasOne("Dekanat.Api.Features.Schedule.Discipline", "Discipline")
@@ -832,6 +1064,11 @@ namespace Dekanat.Api.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_tokens_users_user_id");
+                });
+
+            modelBuilder.Entity("Dekanat.Api.Features.Requests.Request", b =>
+                {
+                    b.Navigation("History");
                 });
 
             modelBuilder.Entity("Dekanat.Api.Features.Schedule.Lesson", b =>
