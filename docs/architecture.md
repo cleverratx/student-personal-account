@@ -203,6 +203,7 @@ erDiagram
         date? EstimatedReadyDate "Примерная дата готовности"
         string? IssuePlace "Место выдачи"
         datetime? IssueDeadline "Срок выдачи"
+        int Version "Номер версии для блокировки при одновременной смене статуса"
         uuid? RelatedAssessmentId FK "Для заявления на пересдачу"
     }
 
@@ -211,7 +212,7 @@ erDiagram
         uuid RequestId FK
         string Status
         string? Comment
-        uuid ChangedByUserId FK
+        uuid? ChangedByUserId FK "Автор смены статуса"
         datetime ChangedAt
     }
 
@@ -294,6 +295,31 @@ erDiagram
 | "Уведомления" | `Notification.Type`, `IsImportant` и связи с `Lesson`, `Request`, `Announcement`, `Assessment` открывают связанный объект |
 | Очередь сотрудника | `Request.CurrentStatus`, `RequestStatusHistory` и `StaffProfile.FacultyId` поддерживают фильтры, историю и разграничение по факультету |
 | Перенос пары | `Lesson` меняется транзакционно, `LessonChange` сохраняет прежнее и новое состояние, `Notification` создаётся с ключом защиты от повторов |
+
+### Статусы заявок и переходы
+
+Все правила смены статуса лежат в одном месте, `RequestWorkflow` в `Features/Requests`. Эндпоинты студента и сотрудника только вызывают его и сами правил не проверяют.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Submitted
+    Submitted --> InProgress: сотрудник
+    Submitted --> Rejected: сотрудник, причина
+    Submitted --> Cancelled: студент
+    InProgress --> Ready: сотрудник, место и срок выдачи
+    InProgress --> Rejected: сотрудник, причина
+    Ready --> Issued: сотрудник
+    Issued --> [*]
+    Rejected --> [*]
+    Cancelled --> [*]
+```
+
+- Студент может только отменить заявку, и только пока она «Подана». Остальные переходы делает сотрудник.
+- Недопустимый переход возвращает `409`, ничего не меняя. Если переход допустим, но нет причины отказа, места выдачи или срока выдачи в будущем, это `400`. Сначала проверяется переход, потом данные.
+- Каждая смена статуса, включая подачу, пишет строку в `RequestStatusHistory`: статус, время, автор и комментарий. У отказа комментарий это причина.
+- `Request.Version` растёт при каждой смене статуса. Если студент отменяет заявку в тот же момент, когда сотрудник берёт её в работу, второе сохранение не проходит, и это тоже `409`.
+- Типы заявок лежат в коде (`RequestTypes`) и попадают в `request_types` миграцией. Поля заявки описывает `FieldSchema`: `string`, `integer`, `date`, `uuid` и `choice`.
+- `Request.RelatedAssessmentId` появится вместе с таблицей оценок. Пока id оценки для заявления на пересдачу лежит в `Fields.assessmentId`.
 
 ### Индексы и ограничения
 
