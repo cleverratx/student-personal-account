@@ -99,7 +99,6 @@ namespace Dekanat.Api.Features.Requests
             };
             request.History.Add( new RequestStatusHistory
             {
-                Id = Guid.NewGuid(),
                 RequestId = request.Id,
                 Status = RequestStatus.Submitted,
                 ChangedAt = now,
@@ -155,9 +154,11 @@ namespace Dekanat.Api.Features.Requests
                 request.IssueDeadline = change.IssueDeadline;
             }
 
+            // Id записи истории не задаём: его выдаст EF при сохранении. Если задать Guid заранее, EF решит,
+            // что запись уже есть в базе, при добавлении в историю загруженной заявки отправит UPDATE вместо INSERT
+            // и сохранение упадёт с DbUpdateConcurrencyException.
             RequestStatusHistory entry = new()
             {
-                Id = Guid.NewGuid(),
                 RequestId = request.Id,
                 Status = change.To,
                 Comment = comment,
