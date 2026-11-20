@@ -65,8 +65,11 @@ namespace Dekanat.Api.Features.Auth
                 dataProtection.PersistKeysToDbContext<AppDbContext>();
             }
 
+            // Без входа политика отвечает 401, при чужой роли 403.
             services.AddAuthorizationBuilder()
-                .SetFallbackPolicy( new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build() );
+                .SetFallbackPolicy( new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build() )
+                .AddPolicy( AuthorizationPolicies.Student, policy => policy.RequireRole( Roles.Student ) )
+                .AddPolicy( AuthorizationPolicies.Staff, policy => policy.RequireRole( Roles.Staff ) );
 
             services.AddMemoryCache();
             services.AddSingleton( TimeProvider.System );

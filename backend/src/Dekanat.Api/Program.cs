@@ -3,6 +3,7 @@ using Dekanat.Api.Features.Auth;
 using Dekanat.Api.Features.Profile;
 using Dekanat.Api.Features.Requests;
 using Dekanat.Api.Features.Schedule;
+using Dekanat.Api.Features.Staff;
 using Dekanat.Api.Infrastructure.Errors;
 using Dekanat.Api.Infrastructure.Health;
 using Dekanat.Api.Infrastructure.OpenApi;
@@ -34,6 +35,7 @@ api.MapAuth();
 api.MapProfile();
 api.MapSchedule();
 api.MapRequests();
+api.MapStaff();
 
 if ( !OpenApiSetup.IsGeneratingDocument )
 {
