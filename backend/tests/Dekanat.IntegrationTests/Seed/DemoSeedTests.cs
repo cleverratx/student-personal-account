@@ -25,6 +25,8 @@ namespace Dekanat.IntegrationTests.Seed
         [Fact]
         public async Task DemoSeedRunsOnceAndOnlyWithPassword()
         {
+            // Считаем только пары демо-групп: другие тесты параллельно добавляют свои пары в ту же базу.
+            string[] seededGroups = [ .. DemoData.Groups.Select( group => group.Name ) ];
             int[] lessonCounts = new int[ 2 ];
             for ( int run = 0; run < 2; run++ )
             {
@@ -33,7 +35,7 @@ namespace Dekanat.IntegrationTests.Seed
                 HttpClient client = demo.CreateBrowser();
                 HttpResponseMessage login = await client.LoginAsync( "a.ivanova", Password );
                 Assert.Equal( HttpStatusCode.OK, login.StatusCode );
-                lessonCounts[ run ] = await CountAsync( db => db.Set<Lesson>().CountAsync( Token ) );
+                lessonCounts[ run ] = await CountAsync( db => db.Set<Lesson>().CountAsync( lesson => seededGroups.Contains( lesson.Group.Name ), Token ) );
             }
 
             // Второй запуск ничего не добавил.

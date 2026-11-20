@@ -492,11 +492,48 @@ Content-Type: application/json
 
 ## Заявки
 
+Только для роли `Student`. Сотрудник получает `403`, у него свой раздел `/api/staff/requests`.
+
+Чей профиль и чьи заявки — сервер берёт только из сессии. Параметры `studentId`, `studentProfileId` в запросе не читаются.
+
+Id заявок — UUID, не порядковые числа.
+
+### `GET /api/request-types`
+
+Справочник типов заявок. Содержит `fieldSchema` — описание полей, по которому фронт строит форму.
+
+```http
+GET /api/request-types
+```
+
+**Ответ 200**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "id": "d7a1c3e5-4b2f-4a6d-9c8e-0f1a2b3c4d01",
+      "name": "Справка об обучении",
+      "description": "Подтверждает, что вы учитесь в вузе",
+      "processingDays": 3,
+      "fieldSchema": {
+        "destination": { "type": "string", "required": true, "title": "Куда предоставить", "maxLength": 200 },
+        "copies":      { "type": "integer", "required": true, "title": "Количество экземпляров", "min": 1, "max": 5 },
+        "delivery":    { "type": "choice", "required": true, "title": "Как получить",
+                         "options": [{"value": "Electronic","title": "Электронно"},{"value": "Deanery","title": "В деканате"}] },
+        "comment":     { "type": "string", "required": false, "title": "Комментарий", "maxLength": 500 }
+      }
+    }
+  ]
+}
+```
+
 ### `GET /api/requests`
 
-Возвращает заявки текущего студента. Поддерживает фильтр по статусу.
-
-**Запрос**
+Заявки текущего студента, новые сверху. Необязательный фильтр `?status=` принимает значения из таблицы статусов.
 
 ```http
 GET /api/requests?status=InProgress
@@ -512,71 +549,14 @@ Content-Type: application/json
   "items": [
     {
       "id": "c3d4e5f6-a7b8-4c9d-8e0f-1a2b3c4d5e6f",
-      "type": {
-        "id": "d4e5f6a7-b8c9-4d0e-9f1a-2b3c4d5e6f7a",
-        "name": "Справка в военкомат"
-      },
+      "type": { "id": "d7a1c3e5-4b2f-4a6d-9c8e-0f1a2b3c4d01", "name": "Справка об обучении" },
       "status": "InProgress",
       "createdAt": "2026-11-05T07:12:00Z",
-      "estimatedReadyDate": "2026-11-12",
+      "estimatedReadyDate": "2026-11-10",
       "issuePlace": null,
       "issueDeadline": null,
-      "fields": {
-        "comment": "Нужна для военкомата"
-      }
-    }
-  ]
-}
-```
-
-### `GET /api/requests/types`
-
-Возвращает типы заявок для карточек быстрого оформления.
-
-**Запрос**
-
-```http
-GET /api/requests/types
-```
-
-**Ответ 200**
-
-```http
-HTTP/1.1 200 OK
-Content-Type: application/json
-
-{
-  "items": [
-    {
-      "id": "d4e5f6a7-b8c9-4d0e-9f1a-2b3c4d5e6f7a",
-      "name": "Справка в военкомат",
-      "description": "Справка для военкомата",
-      "processingDays": 5,
-      "fieldSchema": {
-        "comment": {
-          "type": "string",
-          "required": false,
-          "title": "Комментарий"
-        }
-      }
-    },
-    {
-      "id": "e5f6a7b8-c9d0-4e1f-8a2b-3c4d5e6f7a8b",
-      "name": "Заявление на пересдачу",
-      "description": "Заявление на пересдачу дисциплины",
-      "processingDays": 2,
-      "fieldSchema": {
-        "assessmentId": {
-          "type": "uuid",
-          "required": true,
-          "title": "Дисциплина"
-        },
-        "comment": {
-          "type": "string",
-          "required": false,
-          "title": "Комментарий"
-        }
-      }
+      "fields": { "destination": "В банк", "copies": 1, "delivery": "Deanery" },
+      "canCancel": false
     }
   ]
 }
@@ -584,18 +564,19 @@ Content-Type: application/json
 
 ### `POST /api/requests`
 
-Создаёт заявку текущего студента.
-
-**Запрос**
+Подаёт заявку. Поля проверяются по `fieldSchema` выбранного типа: лишние поля, неизвестные варианты выбора, числа вне диапазона — `400`. Возвращает созданную заявку с историей и заголовком `Location`.
 
 ```http
 POST /api/requests
 Content-Type: application/json
 
 {
-  "requestTypeId": "d4e5f6a7-b8c9-4d0e-9f1a-2b3c4d5e6f7a",
+  "requestTypeId": "d7a1c3e5-4b2f-4a6d-9c8e-0f1a2b3c4d01",
   "fields": {
-    "comment": "Нужна для военкомата"
+    "destination": "В банк",
+    "copies": 2,
+    "delivery": "Deanery",
+    "comment": "Срочно"
   }
 }
 ```
@@ -604,30 +585,40 @@ Content-Type: application/json
 
 ```http
 HTTP/1.1 201 Created
+Location: /api/requests/c3d4e5f6-a7b8-4c9d-8e0f-1a2b3c4d5e6f
 Content-Type: application/json
 
 {
   "id": "c3d4e5f6-a7b8-4c9d-8e0f-1a2b3c4d5e6f",
-  "type": {
-    "id": "d4e5f6a7-b8c9-4d0e-9f1a-2b3c4d5e6f7a",
-    "name": "Справка в военкомат"
-  },
+  "type": { "id": "d7a1c3e5-4b2f-4a6d-9c8e-0f1a2b3c4d01", "name": "Справка об обучении" },
   "status": "Submitted",
   "createdAt": "2026-11-07T10:00:00Z",
-  "estimatedReadyDate": "2026-11-14",
+  "estimatedReadyDate": "2026-11-12",
   "issuePlace": null,
   "issueDeadline": null,
-  "fields": {
-    "comment": "Нужна для военкомата"
-  }
+  "fields": { "destination": "В банк", "copies": 2, "delivery": "Deanery", "comment": "Срочно" },
+  "canCancel": true,
+  "history": [
+    { "status": "Submitted", "comment": null, "changedAt": "2026-11-07T10:00:00Z" }
+  ]
 }
+```
+
+**Ответ 400 — неизвестный тип**
+
+```json
+{ "errors": { "requestTypeId": ["Выберите тип заявки из списка"] } }
+```
+
+**Ответ 400 — ошибки в полях**
+
+```json
+{ "errors": { "fields.destination": ["Заполните поле «Куда предоставить»"], "fields.copies": ["В поле «Количество экземпляров» укажите целое число от 1 до 5"] } }
 ```
 
 ### `GET /api/requests/{id}`
 
-Возвращает заявку текущего студента. Если заявка принадлежит другому студенту, сервер отвечает `404`.
-
-**Запрос**
+Заявка с историей статусов. Чужая заявка и несуществующая возвращают одинаковый `404` — различить их невозможно.
 
 ```http
 GET /api/requests/c3d4e5f6-a7b8-4c9d-8e0f-1a2b3c4d5e6f
@@ -641,38 +632,24 @@ Content-Type: application/json
 
 {
   "id": "c3d4e5f6-a7b8-4c9d-8e0f-1a2b3c4d5e6f",
-  "type": {
-    "id": "d4e5f6a7-b8c9-4d0e-9f1a-2b3c4d5e6f7a",
-    "name": "Справка в военкомат"
-  },
+  "type": { "id": "d7a1c3e5-4b2f-4a6d-9c8e-0f1a2b3c4d01", "name": "Справка об обучении" },
   "status": "InProgress",
   "createdAt": "2026-11-05T07:12:00Z",
-  "estimatedReadyDate": "2026-11-12",
+  "estimatedReadyDate": "2026-11-10",
   "issuePlace": null,
   "issueDeadline": null,
-  "fields": {
-    "comment": "Нужна для военкомата"
-  },
+  "fields": { "destination": "В банк", "copies": 1, "delivery": "Deanery" },
+  "canCancel": false,
   "history": [
-    {
-      "status": "Submitted",
-      "comment": null,
-      "changedAt": "2026-11-05T07:12:00Z"
-    },
-    {
-      "status": "InProgress",
-      "comment": "Передана в деканат",
-      "changedAt": "2026-11-05T11:30:00Z"
-    }
+    { "status": "Submitted", "comment": null, "changedAt": "2026-11-05T07:12:00Z" },
+    { "status": "InProgress", "comment": "Взяли в работу", "changedAt": "2026-11-05T11:30:00Z" }
   ]
 }
 ```
 
 ### `POST /api/requests/{id}/cancel`
 
-Отменяет заявку текущего студента, пока это допустимо по её статусу.
-
-**Запрос**
+Отменяет заявку, пока она в статусе `Submitted`. Возвращает заявку с обновлённым статусом и историей. Если заявку уже взяли в работу — `409`.
 
 ```http
 POST /api/requests/c3d4e5f6-a7b8-4c9d-8e0f-1a2b3c4d5e6f/cancel
@@ -686,14 +663,18 @@ Content-Type: application/json
 
 {
   "id": "c3d4e5f6-a7b8-4c9d-8e0f-1a2b3c4d5e6f",
+  "type": { "id": "d7a1c3e5-4b2f-4a6d-9c8e-0f1a2b3c4d01", "name": "Справка об обучении" },
   "status": "Cancelled",
   "createdAt": "2026-11-05T07:12:00Z",
-  "estimatedReadyDate": "2026-11-12",
+  "estimatedReadyDate": "2026-11-10",
   "issuePlace": null,
   "issueDeadline": null,
-  "fields": {
-    "comment": "Нужна для военкомата"
-  }
+  "fields": { "destination": "В банк", "copies": 1, "delivery": "Deanery" },
+  "canCancel": false,
+  "history": [
+    { "status": "Submitted", "comment": null, "changedAt": "2026-11-05T07:12:00Z" },
+    { "status": "Cancelled", "comment": null, "changedAt": "2026-11-05T12:00:00Z" }
+  ]
 }
 ```
 
