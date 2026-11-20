@@ -84,7 +84,7 @@ namespace Dekanat.Api.Features.Requests
                 .WithTags( "Requests" )
                 .WithName( "GetRequestTypes" )
                 .WithSummary( "Типы заявок и поля каждого типа" )
-                .RequireAuthorization( policy => policy.RequireRole( Roles.Student ) )
+                .RequireAuthorization( AuthorizationPolicies.Student )
                 .Produces<RequestTypesResponse>()
                 .ProducesProblem( StatusCodes.Status401Unauthorized )
                 .ProducesProblem( StatusCodes.Status403Forbidden );
@@ -93,7 +93,7 @@ namespace Dekanat.Api.Features.Requests
                 .WithTags( "Requests" )
                 .WithName( "GetRequests" )
                 .WithSummary( "Заявки того, кто вошёл. Чьи заявки, сервер берёт только из сессии" )
-                .RequireAuthorization( policy => policy.RequireRole( Roles.Student ) )
+                .RequireAuthorization( AuthorizationPolicies.Student )
                 .Produces<RequestsResponse>()
                 .ProducesValidationProblem()
                 .ProducesProblem( StatusCodes.Status401Unauthorized )
@@ -104,7 +104,7 @@ namespace Dekanat.Api.Features.Requests
                 .WithTags( "Requests" )
                 .WithName( "CreateRequest" )
                 .WithSummary( "Подаёт заявку от имени того, кто вошёл. Поля проверяются по схеме типа" )
-                .RequireAuthorization( policy => policy.RequireRole( Roles.Student ) )
+                .RequireAuthorization( AuthorizationPolicies.Student )
                 .Produces<RequestDetailsDto>( StatusCodes.Status201Created )
                 .ProducesValidationProblem()
                 .ProducesProblem( StatusCodes.Status401Unauthorized )
@@ -115,7 +115,7 @@ namespace Dekanat.Api.Features.Requests
                 .WithTags( "Requests" )
                 .WithName( "GetRequest" )
                 .WithSummary( "Заявка с историей статусов. Чужая и несуществующая заявки одинаково дают 404" )
-                .RequireAuthorization( policy => policy.RequireRole( Roles.Student ) )
+                .RequireAuthorization( AuthorizationPolicies.Student )
                 .Produces<RequestDetailsDto>()
                 .ProducesProblem( StatusCodes.Status401Unauthorized )
                 .ProducesProblem( StatusCodes.Status403Forbidden )
@@ -125,7 +125,7 @@ namespace Dekanat.Api.Features.Requests
                 .WithTags( "Requests" )
                 .WithName( "CancelRequest" )
                 .WithSummary( "Отменяет заявку, пока она в статусе «Подана». Дальше её ведёт деканат" )
-                .RequireAuthorization( policy => policy.RequireRole( Roles.Student ) )
+                .RequireAuthorization( AuthorizationPolicies.Student )
                 .Produces<RequestDetailsDto>()
                 .ProducesProblem( StatusCodes.Status401Unauthorized )
                 .ProducesProblem( StatusCodes.Status403Forbidden )
@@ -317,7 +317,7 @@ namespace Dekanat.Api.Features.Requests
                 [ .. request.History.OrderBy( entry => entry.ChangedAt ).Select( entry => new RequestHistoryEntryDto( entry.Status, entry.Comment, entry.ChangedAt ) ) ] );
         }
 
-        private static JsonElement ParseJson( string json )
+        internal static JsonElement ParseJson( string json )
         {
             using JsonDocument document = JsonDocument.Parse( json );
             return document.RootElement.Clone();

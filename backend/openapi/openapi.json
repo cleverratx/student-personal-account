@@ -706,6 +706,67 @@
           }
         }
       }
+    },
+    "/api/staff/requests": {
+      "get": {
+        "tags": [
+          "Staff"
+        ],
+        "summary": "Очередь заявок факультета того, кто вошёл. Факультет сервер берёт только из сессии",
+        "operationId": "GetStaffRequests",
+        "responses": {
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffRequestsResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1343,6 +1404,81 @@
           }
         }
       },
+      "StaffRequestDto": {
+        "required": [
+          "id",
+          "student",
+          "type",
+          "status",
+          "createdAt",
+          "estimatedReadyDate",
+          "fields"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "student": {
+            "$ref": "#/components/schemas/StaffRequestStudentDto"
+          },
+          "type": {
+            "$ref": "#/components/schemas/RequestTypeRefDto"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RequestStatus"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "estimatedReadyDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "fields": {
+            "$ref": "#/components/schemas/JsonElement"
+          }
+        }
+      },
+      "StaffRequestsResponse": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StaffRequestDto"
+            }
+          }
+        }
+      },
+      "StaffRequestStudentDto": {
+        "required": [
+          "id",
+          "fullName",
+          "group"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
+          }
+        }
+      },
       "StudentProfileDto": {
         "required": [
           "faculty",
@@ -1402,6 +1538,9 @@
     },
     {
       "name": "Requests"
+    },
+    {
+      "name": "Staff"
     }
   ]
 }

@@ -61,7 +61,7 @@ namespace Dekanat.Api.Features.Schedule
                 .WithTags( "Schedule" )
                 .WithName( "GetSchedule" )
                 .WithSummary( "Пары группы того, кто вошёл, за период. Группу сервер берёт только из сессии" )
-                .RequireAuthorization( policy => policy.RequireRole( Roles.Student ) )
+                .RequireAuthorization( AuthorizationPolicies.Student )
                 .Produces<ScheduleResponse>()
                 .ProducesValidationProblem()
                 .ProducesProblem( StatusCodes.Status401Unauthorized )
