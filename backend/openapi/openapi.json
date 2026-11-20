@@ -721,7 +721,9 @@
             "type": "string",
             "format": "uuid"
           },
-          "fields": {}
+          "fields": {
+            "$ref": "#/components/schemas/JsonElement"
+          }
         }
       },
       "HealthResponse": {
@@ -796,6 +798,7 @@
           }
         }
       },
+      "JsonElement": { },
       "LessonChangeDto": {
         "required": [
           "type",
@@ -1106,7 +1109,9 @@
             ],
             "format": "date-time"
           },
-          "fields": {},
+          "fields": {
+            "$ref": "#/components/schemas/JsonElement"
+          },
           "canCancel": {
             "type": "boolean"
           },
@@ -1166,7 +1171,9 @@
             ],
             "format": "date-time"
           },
-          "fields": {},
+          "fields": {
+            "$ref": "#/components/schemas/JsonElement"
+          },
           "canCancel": {
             "type": "boolean"
           }
@@ -1192,6 +1199,20 @@
           "changedAt": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "RequestsResponse": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RequestDto"
+            }
           }
         }
       },
@@ -1233,7 +1254,9 @@
             ],
             "format": "int32"
           },
-          "fieldSchema": {}
+          "fieldSchema": {
+            "$ref": "#/components/schemas/JsonElement"
+          }
         }
       },
       "RequestTypeRefDto": {
@@ -1262,20 +1285,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RequestTypeDto"
-            }
-          }
-        }
-      },
-      "RequestsResponse": {
-        "required": [
-          "items"
-        ],
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RequestDto"
             }
           }
         }

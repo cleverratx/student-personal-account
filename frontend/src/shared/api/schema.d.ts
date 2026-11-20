@@ -182,7 +182,7 @@ export interface components {
         CreateRequestBody: {
             /** Format: uuid */
             requestTypeId: string;
-            fields: unknown;
+            fields: components["schemas"]["JsonElement"];
         };
         HealthResponse: {
             status: components["schemas"]["HealthStatus"];
@@ -203,6 +203,7 @@ export interface components {
                 [key: string]: string[];
             };
         };
+        JsonElement: unknown;
         LessonChangeDto: {
             type: components["schemas"]["LessonChangeType"];
             /** Format: date-time */
@@ -274,7 +275,7 @@ export interface components {
             issuePlace: null | string;
             /** Format: date-time */
             issueDeadline: null | string;
-            fields: unknown;
+            fields: components["schemas"]["JsonElement"];
             canCancel: boolean;
             history: components["schemas"]["RequestHistoryEntryDto"][];
         };
@@ -290,7 +291,7 @@ export interface components {
             issuePlace: null | string;
             /** Format: date-time */
             issueDeadline: null | string;
-            fields: unknown;
+            fields: components["schemas"]["JsonElement"];
             canCancel: boolean;
         };
         RequestHistoryEntryDto: {
@@ -298,6 +299,9 @@ export interface components {
             comment: null | string;
             /** Format: date-time */
             changedAt: string;
+        };
+        RequestsResponse: {
+            items: components["schemas"]["RequestDto"][];
         };
         /** @enum {unknown} */
         RequestStatus: "Submitted" | "InProgress" | "Ready" | "Issued" | "Rejected" | "Cancelled";
@@ -308,7 +312,7 @@ export interface components {
             description: string;
             /** Format: int32 */
             processingDays: number | string;
-            fieldSchema: unknown;
+            fieldSchema: components["schemas"]["JsonElement"];
         };
         RequestTypeRefDto: {
             /** Format: uuid */
@@ -317,9 +321,6 @@ export interface components {
         };
         RequestTypesResponse: {
             items: components["schemas"]["RequestTypeDto"][];
-        };
-        RequestsResponse: {
-            items: components["schemas"]["RequestDto"][];
         };
         ScheduleResponse: {
             /** Format: date */
