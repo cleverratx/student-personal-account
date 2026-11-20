@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>D7-04 Ретро — до и после</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f2f5;padding:32px 24px;color:#111827}
+  h1{font-size:20px;font-weight:700;margin-bottom:4px;color:#111827}
+  .meta{font-size:13px;color:#6b7280;margin-bottom:28px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:720px){.cols{grid-template-columns:1fr}}
+  .col{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  .col-header{padding:12px 18px;font-size:13px;font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+  .before .col-header{background:#fef2f2;color:#991b1b;border-bottom:2px solid #fecaca}
+  .after  .col-header{background:#f0fdf4;color:#166534;border-bottom:2px solid #bbf7d0}
+  .col pre{padding:18px;font-family:'Consolas','Fira Mono',monospace;font-size:12.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;color:#1e293b;background:#fafafa;min-height:280px}
+  .summary{margin-top:28px;background:#fff;border-radius:12px;padding:20px 24px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  .summary h2{font-size:15px;font-weight:600;margin-bottom:12px;color:#374151}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;padding:7px 10px;background:#f9fafb;font-weight:600;color:#374151;border-bottom:1px solid #e5e7eb}
+  td{padding:7px 10px;border-bottom:1px solid #f3f4f6;vertical-align:top;line-height:1.5}
+  td:first-child{color:#374151;white-space:nowrap}
+  td:last-child{color:#6b7280}
+  .badge{display:inline-block;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:600;margin-left:6px;vertical-align:middle}
+  .new{background:#dcfce7;color:#166534}
+</style>
+</head>
+<body>
+<h1>D7-04 · Ретро работы с ИИ — AGENTS.md до и после</h1>
+<p class="meta">Цифровой деканат · 20.11.2026 · Правила из реальных ошибок D7-01 и D7-02</p>
+
+<div class="cols">
+  <div class="col before">
+    <div class="col-header">До (1 правило)</div>
+    <pre>## Правила из наших ошибок
+
+Сюда дописываем правила, которые появились после реальных ошибок агентов.
+Формат: правило, а в скобках что случилось и когда.
+
+• PR открываем только в main. Если задачи идут стопкой веток, следующий PR открываем после слияния предыдущего и переноса ветки на свежий main
+  (16.11.2026 PR цепочки D4-02…D4-05 открыли с базой на предыдущую ветку, при слиянии код ушёл в промежуточные ветки)</pre>
+  </div>
+  <div class="col after">
+    <div class="col-header">После <span class="badge new">+5 правил</span></div>
+    <pre>## Правила из наших ошибок
+
+• PR открываем только в main
+  (16.11.2026 PR цепочки D4-02…D4-05)
+
+• Не задавай Id = Guid.NewGuid() у сущности, добавляемой в коллекцию загруженного агрегата.
+  EF сделает UPDATE вместо INSERT и упадёт с DbUpdateConcurrencyException.
+  (19.11.2026 RequestStatusHistory в RequestWorkflow.Apply)
+
+• Приведение типа: ( int )value, пробел внутри, нет пробела снаружи.
+  (19.11.2026 два файла не прошли dotnet format)
+
+• Снапшот EF написан без dotnet — предупреди сразу, попроси прогнать
+  ModelMatchesLatestMigration перед мержем.
+  (19.11.2026 снапшот D7-01)
+
+• Путь API сверяй с docs/api.md до регистрации эндпоинта.
+  (19.11.2026 /api/requests/types vs /api/request-types)
+
+• В начале хода одной фразой скажи, что делаешь прямо сейчас.
+  (19.11.2026 пользователь дважды написал «продолжи»)</pre>
+  </div>
+</div>
+
+<div class="summary">
+  <h2>Что изменилось и почему</h2>
+  <table>
+    <tr><th>Правило</th><th>Ошибка</th><th>Как поймали</th></tr>
+    <tr>
+      <td>Id у записи истории</td>
+      <td>EF делал UPDATE вместо INSERT → DbUpdateConcurrencyException на первом же тесте</td>
+      <td>CI, интеграционный тест SecondChangeOfStaleRequestFailsOnVersion</td>
+    </tr>
+    <tr>
+      <td>Пробел в приведении типа</td>
+      <td>( int ) value вместо ( int )value — лишний пробел после скобки</td>
+      <td>CI, dotnet format --verify-no-changes, 2 файла</td>
+    </tr>
+    <tr>
+      <td>Снапшот без dotnet</td>
+      <td>Агент написал снапшот вручную и не предупредил об этом явно до конца</td>
+      <td>Вручную, мог поймать только CI</td>
+    </tr>
+    <tr>
+      <td>Путь API</td>
+      <td>/api/requests/types в docs, /api/request-types в коде — расхождение</td>
+      <td>Агент заметил при обновлении openapi.json</td>
+    </tr>
+    <tr>
+      <td>Скажи, что делаешь</td>
+      <td>Агент молчал несколько минут, читая файлы</td>
+      <td>Пользователь написал «продолжи» дважды</td>
+    </tr>
+  </table>
+</div>
+
+</body>
+</html>
