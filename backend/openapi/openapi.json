@@ -228,6 +228,370 @@
         }
       }
     },
+    "/api/request-types": {
+      "get": {
+        "tags": [
+          "Requests"
+        ],
+        "summary": "Типы заявок и поля каждого типа",
+        "operationId": "GetRequestTypes",
+        "responses": {
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestTypesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/requests": {
+      "get": {
+        "tags": [
+          "Requests"
+        ],
+        "summary": "Заявки того, кто вошёл. Чьи заявки, сервер берёт только из сессии",
+        "operationId": "GetRequests",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/RequestStatus"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Requests"
+        ],
+        "summary": "Подаёт заявку от имени того, кто вошёл. Поля проверяются по схеме типа",
+        "operationId": "CreateRequest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRequestBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestDetailsDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/requests/{id}": {
+      "get": {
+        "tags": [
+          "Requests"
+        ],
+        "summary": "Заявка с историей статусов. Чужая и несуществующая заявки одинаково дают 404",
+        "operationId": "GetRequest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestDetailsDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/requests/{id}/cancel": {
+      "post": {
+        "tags": [
+          "Requests"
+        ],
+        "summary": "Отменяет заявку, пока она в статусе «Подана». Дальше её ведёт деканат",
+        "operationId": "CancelRequest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestDetailsDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/login": {
       "post": {
         "tags": [
@@ -342,206 +706,24 @@
           }
         }
       }
-    },
-    "/api/request-types": {
-      "get": {
-        "tags": [
-          "Requests"
-        ],
-        "summary": "Типы заявок и поля каждого типа",
-        "operationId": "GetRequestTypes",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RequestTypesResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/ProblemDetails"
-          },
-          "403": {
-            "$ref": "#/components/responses/ProblemDetails"
-          }
-        }
-      }
-    },
-    "/api/requests": {
-      "get": {
-        "tags": [
-          "Requests"
-        ],
-        "summary": "Заявки того, кто вошёл. Фильтр по статусу необязателен",
-        "operationId": "GetRequests",
-        "parameters": [
-          {
-            "name": "status",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "$ref": "#/components/schemas/RequestStatus"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RequestsResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationProblem"
-          },
-          "401": {
-            "$ref": "#/components/responses/ProblemDetails"
-          },
-          "403": {
-            "$ref": "#/components/responses/ProblemDetails"
-          },
-          "404": {
-            "$ref": "#/components/responses/ProblemDetails"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Requests"
-        ],
-        "summary": "Подаёт заявку. Поля проверяются по схеме типа",
-        "operationId": "CreateRequest",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateRequestBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RequestDetailsDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationProblem"
-          },
-          "401": {
-            "$ref": "#/components/responses/ProblemDetails"
-          },
-          "403": {
-            "$ref": "#/components/responses/ProblemDetails"
-          },
-          "404": {
-            "$ref": "#/components/responses/ProblemDetails"
-          }
-        }
-      }
-    },
-    "/api/requests/{id}": {
-      "get": {
-        "tags": [
-          "Requests"
-        ],
-        "summary": "Заявка с историей. Чужая и несуществующая одинаково дают 404",
-        "operationId": "GetRequest",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RequestDetailsDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/ProblemDetails"
-          },
-          "403": {
-            "$ref": "#/components/responses/ProblemDetails"
-          },
-          "404": {
-            "$ref": "#/components/responses/ProblemDetails"
-          }
-        }
-      }
-    },
-    "/api/requests/{id}/cancel": {
-      "post": {
-        "tags": [
-          "Requests"
-        ],
-        "summary": "Отменяет заявку, пока она в статусе «Подана»",
-        "operationId": "CancelRequest",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RequestDetailsDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/ProblemDetails"
-          },
-          "403": {
-            "$ref": "#/components/responses/ProblemDetails"
-          },
-          "404": {
-            "$ref": "#/components/responses/ProblemDetails"
-          },
-          "409": {
-            "$ref": "#/components/responses/ProblemDetails"
-          }
-        }
-      }
     }
   },
   "components": {
     "schemas": {
+      "CreateRequestBody": {
+        "required": [
+          "requestTypeId",
+          "fields"
+        ],
+        "type": "object",
+        "properties": {
+          "requestTypeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fields": {}
+        }
+      },
       "HealthResponse": {
         "required": [
           "status",
@@ -875,6 +1057,229 @@
           }
         }
       },
+      "RequestDetailsDto": {
+        "required": [
+          "id",
+          "type",
+          "status",
+          "createdAt",
+          "estimatedReadyDate",
+          "issuePlace",
+          "issueDeadline",
+          "fields",
+          "canCancel",
+          "history"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "$ref": "#/components/schemas/RequestTypeRefDto"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RequestStatus"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "estimatedReadyDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "issuePlace": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "issueDeadline": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "fields": {},
+          "canCancel": {
+            "type": "boolean"
+          },
+          "history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RequestHistoryEntryDto"
+            }
+          }
+        }
+      },
+      "RequestDto": {
+        "required": [
+          "id",
+          "type",
+          "status",
+          "createdAt",
+          "estimatedReadyDate",
+          "issuePlace",
+          "issueDeadline",
+          "fields",
+          "canCancel"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "$ref": "#/components/schemas/RequestTypeRefDto"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RequestStatus"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "estimatedReadyDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "issuePlace": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "issueDeadline": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "fields": {},
+          "canCancel": {
+            "type": "boolean"
+          }
+        }
+      },
+      "RequestHistoryEntryDto": {
+        "required": [
+          "status",
+          "comment",
+          "changedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/RequestStatus"
+          },
+          "comment": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "changedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RequestStatus": {
+        "enum": [
+          "Submitted",
+          "InProgress",
+          "Ready",
+          "Issued",
+          "Rejected",
+          "Cancelled"
+        ]
+      },
+      "RequestTypeDto": {
+        "required": [
+          "id",
+          "name",
+          "description",
+          "processingDays",
+          "fieldSchema"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "processingDays": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "fieldSchema": {}
+        }
+      },
+      "RequestTypeRefDto": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "RequestTypesResponse": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RequestTypeDto"
+            }
+          }
+        }
+      },
+      "RequestsResponse": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RequestDto"
+            }
+          }
+        }
+      },
       "ScheduleResponse": {
         "required": [
           "from",
@@ -970,283 +1375,6 @@
           "Student",
           "Staff"
         ]
-      },
-      "RequestStatus": {
-        "enum": [
-          "Submitted",
-          "InProgress",
-          "Ready",
-          "Issued",
-          "Rejected",
-          "Cancelled"
-        ],
-        "type": "string"
-      },
-      "RequestTypeRefDto": {
-        "required": [
-          "id",
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          }
-        }
-      },
-      "RequestTypeDto": {
-        "required": [
-          "id",
-          "name",
-          "description",
-          "processingDays",
-          "fieldSchema"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "processingDays": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "fieldSchema": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Поля по схеме типа"
-          }
-        }
-      },
-      "RequestTypesResponse": {
-        "required": [
-          "items"
-        ],
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RequestTypeDto"
-            }
-          }
-        }
-      },
-      "CreateRequestBody": {
-        "required": [
-          "requestTypeId",
-          "fields"
-        ],
-        "type": "object",
-        "properties": {
-          "requestTypeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "fields": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Значения полей по схеме типа"
-          }
-        }
-      },
-      "RequestHistoryEntryDto": {
-        "required": [
-          "status",
-          "changedAt"
-        ],
-        "type": "object",
-        "properties": {
-          "status": {
-            "$ref": "#/components/schemas/RequestStatus"
-          },
-          "comment": {
-            "type": "string",
-            "nullable": true
-          },
-          "changedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "RequestDto": {
-        "required": [
-          "id",
-          "type",
-          "status",
-          "createdAt",
-          "canCancel",
-          "fields"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "type": {
-            "$ref": "#/components/schemas/RequestTypeRefDto"
-          },
-          "status": {
-            "$ref": "#/components/schemas/RequestStatus"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "estimatedReadyDate": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "issuePlace": {
-            "type": "string",
-            "nullable": true
-          },
-          "issueDeadline": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "fields": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "canCancel": {
-            "type": "boolean"
-          }
-        }
-      },
-      "RequestDetailsDto": {
-        "required": [
-          "id",
-          "type",
-          "status",
-          "createdAt",
-          "canCancel",
-          "fields",
-          "history"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "type": {
-            "$ref": "#/components/schemas/RequestTypeRefDto"
-          },
-          "status": {
-            "$ref": "#/components/schemas/RequestStatus"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "estimatedReadyDate": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "issuePlace": {
-            "type": "string",
-            "nullable": true
-          },
-          "issueDeadline": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "fields": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "canCancel": {
-            "type": "boolean"
-          },
-          "history": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RequestHistoryEntryDto"
-            }
-          }
-        }
-      },
-      "RequestsResponse": {
-        "required": [
-          "items"
-        ],
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RequestDto"
-            }
-          }
-        }
-      }
-    },
-    "responses": {
-      "ProblemDetails": {
-        "description": "Ошибка",
-        "content": {
-          "application/problem+json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "status": {
-                  "type": "integer"
-                },
-                "title": {
-                  "type": "string"
-                },
-                "detail": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      },
-      "ValidationProblem": {
-        "description": "Ошибка валидации",
-        "content": {
-          "application/problem+json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "status": {
-                  "type": "integer"
-                },
-                "title": {
-                  "type": "string"
-                },
-                "errors": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
       }
     }
   },
