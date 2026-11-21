@@ -2,7 +2,7 @@ import { FileText, Plus } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { StatusBadge, useRequests, type RequestItem, type RequestStatus } from '@/entities/requests';
-import { ButtonLink, EmptyState, ErrorState, IconLink, ScreenSkeleton } from '@/shared/ui';
+import { ButtonLink, EmptyState, ErrorState, ScreenSkeleton } from '@/shared/ui';
 import { ScreenHeader } from '@/widgets/app-shell';
 import styles from './RequestsPage.module.css';
 
@@ -48,12 +48,7 @@ export function RequestsPage() {
 
   return (
     <>
-      <ScreenHeader
-        title="Заявки"
-        right={
-          <IconLink to="/requests/new" label="Новая заявка" icon={<Plus size={22} aria-hidden="true" />} />
-        }
-      />
+      <ScreenHeader title="Заявки" />
 
       {isPending && <ScreenSkeleton rows={3} label="Загружаем заявки" />}
 
