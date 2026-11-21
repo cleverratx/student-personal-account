@@ -46,10 +46,17 @@ describe('каркас кабинета', () => {
     expect(labels(navs()[1]!)).toEqual(['Заявки', 'Расписание', 'Объявления', 'Профиль']);
   });
 
+  it('/requests открывает страницу заявок', async () => {
+    fakeBackend({ session: 'Student' });
+    renderApp('/requests');
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'Заявки' })).toBeInTheDocument();
+    expect(document.title).toBe('Заявки — Цифровой деканат');
+  });
+
   it.each([
     ['/today', 'Сегодня', 'Student'],
     ['/grades', 'Учёба', 'Student'],
-    ['/requests', 'Заявки', 'Student'],
     ['/notifications', 'Уведомления', 'Student'],
     ['/staff/schedule', 'Расписание', 'Staff'],
     ['/staff/announcements', 'Объявления', 'Staff'],
