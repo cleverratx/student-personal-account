@@ -356,7 +356,8 @@ namespace Dekanat.IntegrationTests.Staff
         {
             await using AsyncServiceScope scope = factory.Services.CreateAsyncScope();
             AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            return await db.Set<StudyGroup>().Where( g => g.Name == name ).Select( g => g.Id ).FirstAsync( Token );
+            StudyGroup found = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstAsync( db.Set<StudyGroup>().Where( g => g.Name == name ), Token );
+            return found.Id;
         }
 
         private async Task<HttpClient> NewStaffAsync( Guid facultyId )
