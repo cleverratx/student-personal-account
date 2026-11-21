@@ -301,11 +301,11 @@ export interface components {
         };
         ChangeLessonBody: {
             /** Format: date-time */
-            startsAt?: null | string;
+            startsAt: null | string;
             /** Format: date-time */
-            endsAt?: null | string;
-            room?: null | string;
-            reason?: null | string;
+            endsAt: null | string;
+            room: null | string;
+            reason: null | string;
         };
         ChangeStatusBody: {
             status: components["schemas"]["RequestStatus"];
@@ -1143,7 +1143,12 @@ export interface operations {
     };
     GetStaffRequests: {
         parameters: {
-            query?: never;
+            query?: {
+                status?: components["schemas"]["RequestStatus"];
+                type?: string;
+                group?: string;
+                search?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
