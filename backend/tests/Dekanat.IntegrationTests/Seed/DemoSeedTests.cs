@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Dekanat.IntegrationTests.Seed
 {
-    /// <summary>
+    /// <summary>git add .
     /// Демо-сид на общей тестовой базе. Все проверки сида в одном тесте: два сида параллельно на одной базе
     /// мешали бы друг другу.
     /// </summary>

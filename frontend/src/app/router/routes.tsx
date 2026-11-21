@@ -5,6 +5,7 @@ import { NotFoundPage } from '@/pages/not-found';
 import { ProfilePage } from '@/pages/profile';
 import { SchedulePage } from '@/pages/schedule';
 import { StubPage } from '@/pages/stub';
+import { NewRequestPage, RequestDetailPage, RequestsPage } from '@/pages/requests';
 import { GuestOnly, RequireAuth, RootRedirect } from './guards';
 
 // Витрина UI-кита есть только в dev-сервере. В сборке import.meta.env.DEV равно false,
@@ -37,7 +38,9 @@ export const routes: RouteObject[] = [
       { path: '/today', element: <StubPage title="Сегодня" text="Следующая пара, ближайший срок, важные объявления и активные заявки." /> },
       { path: '/schedule', element: <SchedulePage /> },
       { path: '/grades', element: <StubPage title="Учёба" text="Допуск к сессии, долги и оценки по предметам." /> },
-      { path: '/requests', element: <StubPage title="Заявки" text="Справки и заявления со статусами и примерной датой готовности." /> },
+      { path: '/requests', element: <RequestsPage /> },
+      { path: '/requests/new', element: <NewRequestPage /> },
+      { path: '/requests/:id', element: <RequestDetailPage /> },
       { path: '/notifications', element: <StubPage title="Уведомления" text="Объявления, переносы пар и изменения статусов заявок." /> },
       { path: '/profile', element: <ProfilePage /> },
     ],
