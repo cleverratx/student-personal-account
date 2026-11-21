@@ -32,27 +32,27 @@ namespace Dekanat.Api.Features.Notifications
                 RequestStatus.InProgress => (
                     "Заявка взята в работу",
                     $"Ваша заявка «{typeName}» взята в обработку.",
-                    false ),
+                    false),
                 RequestStatus.Ready => (
                     "Справка готова",
                     string.IsNullOrWhiteSpace( comment )
                         ? $"Ваша заявка «{typeName}» готова к выдаче."
                         : $"Ваша заявка «{typeName}» готова. {comment.Trim()}",
-                    true ),
+                    true),
                 RequestStatus.Issued => (
                     "Справка выдана",
                     $"Ваша заявка «{typeName}» закрыта как выданная.",
-                    false ),
+                    false),
                 RequestStatus.Rejected => (
                     "Заявка отклонена",
                     string.IsNullOrWhiteSpace( comment )
                         ? $"Ваша заявка «{typeName}» отклонена."
                         : $"Ваша заявка «{typeName}» отклонена: {comment.Trim()}",
-                    true ),
+                    true),
                 _ => (
                     "Статус заявки изменился",
                     $"Статус заявки «{typeName}» изменён на «{RequestWorkflow.Title( newStatus )}».",
-                    false ),
+                    false),
             };
 
             return new Notification
@@ -97,20 +97,20 @@ namespace Dekanat.Api.Features.Notifications
                     "Перенос пары",
                     string.IsNullOrWhiteSpace( reason )
                         ? $"Пара «{disciplineName}» перенесена. Новое время: {newStartsAt.Value:HH:mm} UTC, аудитория {newRoom}."
-                        : $"Пара «{disciplineName}» перенесена ({reason.Trim()}). Новое время: {newStartsAt.Value:HH:mm} UTC, аудитория {newRoom}." ),
+                        : $"Пара «{disciplineName}» перенесена ({reason.Trim()}). Новое время: {newStartsAt.Value:HH:mm} UTC, аудитория {newRoom}."),
                 LessonChangeType.RoomChange => (
                     "Смена аудитории",
                     string.IsNullOrWhiteSpace( reason )
                         ? $"Пара «{disciplineName}» пройдёт в аудитории {newRoom}."
-                        : $"Пара «{disciplineName}» пройдёт в аудитории {newRoom} ({reason.Trim()})." ),
+                        : $"Пара «{disciplineName}» пройдёт в аудитории {newRoom} ({reason.Trim()})."),
                 LessonChangeType.Cancellation => (
                     "Отмена пары",
                     string.IsNullOrWhiteSpace( reason )
                         ? $"Пара «{disciplineName}» отменена."
-                        : $"Пара «{disciplineName}» отменена: {reason.Trim()}." ),
+                        : $"Пара «{disciplineName}» отменена: {reason.Trim()}."),
                 _ => (
                     "Изменение в расписании",
-                    $"Изменение в расписании по дисциплине «{disciplineName}»." ),
+                    $"Изменение в расписании по дисциплине «{disciplineName}»."),
             };
 
             return
