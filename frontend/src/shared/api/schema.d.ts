@@ -431,7 +431,7 @@ export interface operations {
                 };
             };
         };
-    }
+    };
     GetMe: {
         parameters: {
             query?: never;
@@ -469,7 +469,7 @@ export interface operations {
                 };
             };
         };
-    }
+    };
     GetMyProfile: {
         parameters: {
             query?: never;
@@ -516,7 +516,7 @@ export interface operations {
                 };
             };
         };
-    }
+    };
     GetSchedule: {
         parameters: {
             query?: {
@@ -584,7 +584,7 @@ export interface operations {
                 };
             };
         };
-    }
+    };
     GetRequestTypes: {
         parameters: {
             query?: never;
@@ -631,7 +631,7 @@ export interface operations {
                 };
             };
         };
-    }
+    };
     GetRequests: {
         parameters: {
             query?: {
@@ -698,7 +698,7 @@ export interface operations {
                 };
             };
         };
-    }
+    };
     CreateRequest: {
         parameters: {
             query?: never;
@@ -767,7 +767,7 @@ export interface operations {
                 };
             };
         };
-    }
+    };
     GetRequest: {
         parameters: {
             query?: never;
@@ -825,7 +825,7 @@ export interface operations {
                 };
             };
         };
-    }
+    };
     CancelRequest: {
         parameters: {
             query?: never;
@@ -892,7 +892,7 @@ export interface operations {
                 };
             };
         };
-    }
+    };
     Login: {
         parameters: {
             query?: never;
@@ -952,7 +952,7 @@ export interface operations {
                 };
             };
         };
-    }
+    };
     Logout: {
         parameters: {
             query?: never;
@@ -997,7 +997,7 @@ export interface operations {
                 };
             };
         };
-    }
+    };
     GetStaffRequests: {
         parameters: {
             query?: never;
@@ -1053,5 +1053,5 @@ export interface operations {
                 };
             };
         };
-    }
+    };
 }
