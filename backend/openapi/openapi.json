@@ -1431,7 +1431,7 @@
           }
         }
       },
-      "JsonElement": { },
+      "JsonElement": {},
       "LessonChangeDto": {
         "required": [
           "type",

@@ -1,2 +1,3 @@
 * text=auto
+grep "json" .gitattributes
 *.cs text eol=crlf
