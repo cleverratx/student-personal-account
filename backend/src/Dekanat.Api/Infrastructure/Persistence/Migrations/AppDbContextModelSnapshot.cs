@@ -22,7 +22,72 @@ namespace Dekanat.Api.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Dekanat.Api.Features.Auth.AppUser", b =>
+            
+            modelBuilder.Entity("Dekanat.Api.Features.Staff.Announcement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AuthorStaffProfileId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("author_staff_profile_id");
+
+                    b.Property<string>("AudienceType")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("audience_type");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("content");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_at");
+
+                    b.Property<Guid?>("FacultyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("faculty_id");
+
+                    b.Property<Guid?>("GroupId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("group_id");
+
+                    b.Property<bool>("IsImportant")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_important");
+
+                    b.Property<DateTime>("PublishedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("published_at");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("title");
+
+                    b.HasKey("Id")
+                        .HasName("pk_announcements");
+
+                    b.HasIndex("AuthorStaffProfileId")
+                        .HasDatabaseName("ix_announcements_author_staff_profile_id");
+
+                    b.HasIndex("FacultyId", "ExpiresAt")
+                        .HasDatabaseName("ix_announcements_faculty_id_expires_at");
+
+                    b.HasIndex("GroupId", "ExpiresAt")
+                        .HasDatabaseName("ix_announcements_group_id_expires_at");
+
+                    b.ToTable("announcements", (string)null);
+                });
+
+modelBuilder.Entity("Dekanat.Api.Features.Auth.AppUser", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -864,7 +929,29 @@ namespace Dekanat.Api.Infrastructure.Persistence.Migrations
                     b.ToTable("user_tokens", (string)null);
                 });
 
-            modelBuilder.Entity("Dekanat.Api.Features.Profile.StaffProfile", b =>
+            
+            modelBuilder.Entity("Dekanat.Api.Features.Staff.Announcement", b =>
+                {
+                    b.HasOne("Dekanat.Api.Features.Profile.Faculty", null)
+                        .WithMany()
+                        .HasForeignKey("FacultyId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_announcements_faculties_faculty_id");
+
+                    b.HasOne("Dekanat.Api.Features.Profile.StudyGroup", null)
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_announcements_groups_group_id");
+
+                    b.HasOne("Dekanat.Api.Features.Staff.StaffProfile", null)
+                        .WithMany()
+                        .HasForeignKey("AuthorStaffProfileId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_announcements_staff_profiles_author_staff_profile_id");
+                });
+
+modelBuilder.Entity("Dekanat.Api.Features.Profile.StaffProfile", b =>
                 {
                     b.HasOne("Dekanat.Api.Features.Profile.Faculty", "Faculty")
                         .WithMany()
