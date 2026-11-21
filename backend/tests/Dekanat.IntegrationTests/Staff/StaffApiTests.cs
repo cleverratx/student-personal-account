@@ -27,12 +27,12 @@ namespace Dekanat.IntegrationTests.Staff
         {
             var ctx = await SetupFacultyAsync();
             Guid typeA = RequestTypes.StudyCertificateId;
-            Guid typeB = new Guid("d7a1c3e5-4b2f-4a6d-9c8e-0f1a2b3c4d03");
+            Guid typeB = new Guid( "d7a1c3e5-4b2f-4a6d-9c8e-0f1a2b3c4d03" );
             await SubmitAsync( ctx.StudentA, typeA );
             await SubmitAsync( ctx.StudentB, typeA );
             await SubmitAsync( ctx.StudentA, typeB );
 
-            using JsonDocument byType  = await GetQueueAsync( ctx.Staff, $"?type={typeA}" );
+            using JsonDocument byType = await GetQueueAsync( ctx.Staff, $"?type={typeA}" );
             using JsonDocument byGroup = await GetQueueAsync( ctx.Staff, $"?group={Uri.EscapeDataString( ctx.GroupA )}" );
             using JsonDocument bySearch = await GetQueueAsync( ctx.Staff, $"?search={Uri.EscapeDataString( ctx.NameA[ ..4 ] )}" );
 
@@ -126,8 +126,7 @@ namespace Dekanat.IntegrationTests.Staff
             using JsonDocument ready = await ReadAsync( await ctx.Staff.GetAsync( $"/api/staff/requests/{id}", Token ) );
             Assert.Equal( "Деканат 204", ready.RootElement.GetProperty( "issuePlace" ).GetString() );
             Assert.Equal( 3, ready.RootElement.GetProperty( "history" ).GetArrayLength() );
-            Assert.Empty( ready.RootElement.GetProperty( "availableTransitions" ).EnumerateArray()
-                .Select( e => e.GetString() ).Where( s => s == "InProgress" ) );
+            Assert.DoesNotContain( "InProgress", ready.RootElement.GetProperty( "availableTransitions" ).EnumerateArray().Select( e => e.GetString() ) );
 
             await AssertStatusAsync( ctx.Staff, id, "Issued",
                 new { status = "Issued" } );
@@ -221,7 +220,7 @@ namespace Dekanat.IntegrationTests.Staff
                 title = "Общее объявление",
                 content = "Текст для всего факультета.",
                 isImportant = false,
-                expiresAt = (string?)null,
+                expiresAt = ( string? )null,
                 audience = new { type = "Faculty" },
             };
             HttpResponseMessage resp = await ctx.Staff.PostAsJsonAsync( "/api/staff/announcements", body, Token );
@@ -243,7 +242,7 @@ namespace Dekanat.IntegrationTests.Staff
                 title = "Объявление",
                 content = "Текст.",
                 isImportant = false,
-                expiresAt = (string?)null,
+                expiresAt = ( string? )null,
                 audience = new { type = "Group", groupId = ctxB.GroupAId },   // группа другого факультета
             };
             HttpResponseMessage resp = await ctxA.Staff.PostAsJsonAsync( "/api/staff/announcements", body, Token );
@@ -262,9 +261,9 @@ namespace Dekanat.IntegrationTests.Staff
             var body = new
             {
                 startsAt = "2099-05-01T09:00:00Z",
-                endsAt   = "2099-05-01T10:30:00Z",
-                room     = "305",
-                reason   = "Занятость аудитории",
+                endsAt = "2099-05-01T10:30:00Z",
+                room = "305",
+                reason = "Занятость аудитории",
             };
             HttpResponseMessage resp = await staff.PostAsJsonAsync( $"/api/staff/lessons/{lesson.Id}/change", body, Token );
 
@@ -316,8 +315,8 @@ namespace Dekanat.IntegrationTests.Staff
         private async Task<FacultyContext> SetupFacultyAsync()
         {
             Guid facultyId = await CreateFacultyAsync();
-            ( HttpClient studentA, string groupA, Guid groupAId, string nameA ) = await NewStudentAsync( facultyId );
-            ( HttpClient studentB, _, _, _ ) = await NewStudentAsync( facultyId );
+            (HttpClient studentA, string groupA, Guid groupAId, string nameA) = await NewStudentAsync( facultyId );
+            (HttpClient studentB, _, _, _) = await NewStudentAsync( facultyId );
             HttpClient staff = await NewStaffAsync( facultyId );
             return new FacultyContext( facultyId, staff, studentA, studentB, nameA, groupA, groupAId );
         }
@@ -332,12 +331,12 @@ namespace Dekanat.IntegrationTests.Staff
             return faculty.Id;
         }
 
-        private async Task<( HttpClient Client, string Group, Guid GroupId, string Name )> NewStudentAsync( Guid facultyId )
+        private async Task<(HttpClient Client, string Group, Guid GroupId, string Name)> NewStudentAsync( Guid facultyId )
         {
             TestUser user = await TestUsers.CreateAsync( factory.Services );
             string suffix = Guid.NewGuid().ToString( "N" )[ ..8 ];
             string group = $"Г-{suffix}";
-            string name  = $"Студентов{suffix} Иван";
+            string name = $"Студентов{suffix} Иван";
 
             await using ( AsyncServiceScope scope = factory.Services.CreateAsyncScope() )
             {
@@ -350,7 +349,7 @@ namespace Dekanat.IntegrationTests.Staff
 
             HttpClient client = factory.CreateBrowser();
             Assert.Equal( HttpStatusCode.OK, ( await client.LoginAsync( user.Login, user.Password ) ).StatusCode );
-            return ( client, group, await GroupIdAsync( group ), name );
+            return (client, group, await GroupIdAsync( group ), name);
         }
 
         private async Task<Guid> GroupIdAsync( string name )
@@ -379,13 +378,13 @@ namespace Dekanat.IntegrationTests.Staff
         private async Task<Lesson> CreateLessonAsync( string room = "214", DateTime? startsAt = null, DateTime? endsAt = null )
         {
             DateTime start = startsAt ?? new DateTime( 2099, 5, 1, 7, 40, 0, DateTimeKind.Utc );
-            DateTime end   = endsAt   ?? new DateTime( 2099, 5, 1, 9, 10, 0, DateTimeKind.Utc );
+            DateTime end = endsAt ?? new DateTime( 2099, 5, 1, 9, 10, 0, DateTimeKind.Utc );
 
             await using AsyncServiceScope scope = factory.Services.CreateAsyncScope();
             AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             Guid facultyId = await CreateFacultyAsync();
-            StudyProgram program = new() { Id = Guid.NewGuid(), FacultyId = facultyId, Code = $"L{Guid.NewGuid().ToString("N")[ ..6 ]}", Name = "Прог" };
-            StudyGroup group = new() { Id = Guid.NewGuid(), Program = program, Name = $"ЛГ-{Guid.NewGuid().ToString("N")[ ..4 ]}", Course = 1 };
+            StudyProgram program = new() { Id = Guid.NewGuid(), FacultyId = facultyId, Code = $"L{Guid.NewGuid().ToString( "N" )[ ..6 ]}", Name = "Прог" };
+            StudyGroup group = new() { Id = Guid.NewGuid(), Program = program, Name = $"ЛГ-{Guid.NewGuid().ToString( "N" )[ ..4 ]}", Course = 1 };
             Teacher teacher = new() { Id = Guid.NewGuid(), FullName = "Преп П.П.", Department = "Каф", Position = "Доц" };
             Discipline disc = new() { Id = Guid.NewGuid(), Name = "Дисциплина" };
             var lesson = new Dekanat.Api.Features.Schedule.Lesson
@@ -407,7 +406,7 @@ namespace Dekanat.IntegrationTests.Staff
         private static async Task<Guid> SubmitAsync( HttpClient student, Guid typeId )
         {
             var body = typeId == RequestTypes.StudyCertificateId
-                ? (object)new { requestTypeId = typeId, fields = new { destination = "В банк", copies = 1, delivery = "Deanery" } }
+                ? ( object )new { requestTypeId = typeId, fields = new { destination = "В банк", copies = 1, delivery = "Deanery" } }
                 : new { requestTypeId = typeId, fields = new { destination = "Соцзащита", copies = 1, delivery = "Deanery" } };
             HttpResponseMessage resp = await student.PostAsJsonAsync( "/api/requests", body, Token );
             Assert.Equal( HttpStatusCode.Created, resp.StatusCode );
