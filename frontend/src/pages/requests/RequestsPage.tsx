@@ -1,7 +1,7 @@
 import { FileText, Plus } from 'lucide-react';
 
 import { StatusBadge, useRequests, type RequestItem, type RequestStatus } from '@/entities/requests';
-import { Button, ButtonLink, EmptyState, ErrorState, IconLink, ScreenSkeleton } from '@/shared/ui';
+import { ButtonLink, EmptyState, ErrorState, ScreenSkeleton } from '@/shared/ui';
 import { ScreenHeader } from '@/widgets/app-shell';
 import styles from './RequestsPage.module.css';
 

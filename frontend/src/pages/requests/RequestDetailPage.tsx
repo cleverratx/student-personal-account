@@ -26,7 +26,6 @@ function formatDate(iso: string): string {
 }
 
 function Timeline({ history, currentStatus }: { history: RequestHistoryEntry[]; currentStatus: RequestStatus }) {
-  const isFinal = ['Issued', 'Rejected', 'Cancelled'].includes(currentStatus);
   const historyMap = new Map(history.map((e) => [e.status, e]));
 
   const steps: { status: RequestStatus; label: string; entry?: RequestHistoryEntry; pending: boolean }[] =
