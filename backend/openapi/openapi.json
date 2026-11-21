@@ -714,6 +714,37 @@
         ],
         "summary": "Очередь заявок факультета того, кто вошёл. Факультет сервер берёт только из сессии",
         "operationId": "GetStaffRequests",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/RequestStatus"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "group",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "500": {
             "description": "Internal Server Error",
@@ -1252,6 +1283,12 @@
         }
       },
       "ChangeLessonBody": {
+        "required": [
+          "startsAt",
+          "endsAt",
+          "room",
+          "reason"
+        ],
         "type": "object",
         "properties": {
           "startsAt": {
@@ -1283,10 +1320,10 @@
         }
       },
       "ChangeStatusBody": {
-        "type": "object",
         "required": [
           "status"
         ],
+        "type": "object",
         "properties": {
           "status": {
             "$ref": "#/components/schemas/RequestStatus"
