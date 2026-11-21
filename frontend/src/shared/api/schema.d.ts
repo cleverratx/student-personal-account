@@ -55,10 +55,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/request-types": { get: operations["GetRequestTypes"] };
-    "/api/requests": { get: operations["GetRequests"]; post: operations["CreateRequest"] };
-    "/api/requests/{id}": { get: operations["GetRequest"] };
-    "/api/requests/{id}/cancel": { post: operations["CancelRequest"] };
+    "/api/request-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Типы заявок и поля каждого типа */
+        get: operations["GetRequestTypes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Заявки того, кто вошёл. Чьи заявки, сервер берёт только из сессии */
+        get: operations["GetRequests"];
+        put?: never;
+        /** Подаёт заявку от имени того, кто вошёл. Поля проверяются по схеме типа */
+        post: operations["CreateRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Заявка с историей статусов. Чужая и несуществующая заявки одинаково дают 404 */
+        get: operations["GetRequest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/requests/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Отменяет заявку, пока она в статусе «Подана». Дальше её ведёт деканат */
+        post: operations["CancelRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/schedule": {
         parameters: {
             query?: never;
@@ -133,6 +198,7 @@ export interface components {
                 [key: string]: string[];
             };
         };
+        JsonElement: unknown;
         LessonChangeDto: {
             type: components["schemas"]["LessonChangeType"];
             /** Format: date-time */
@@ -163,55 +229,10 @@ export interface components {
         };
         /** @enum {unknown} */
         LessonType: "Lecture" | "Practice" | "Lab" | "Consultation" | "Exam" | "Credit" | "GradedCredit";
-        RequestStatus: "Submitted" | "InProgress" | "Ready" | "Issued" | "Rejected" | "Cancelled";
-        RequestTypeRefDto: {
-            id: string;
-            name: string;
-        };
-        RequestTypeDto: {
-            id: string;
-            name: string;
-            description: string;
-            processingDays: number;
-            fieldSchema: Record<string, unknown>;
-        };
-        RequestTypesResponse: {
-            items: components["schemas"]["RequestTypeDto"][];
-        };
         CreateRequestBody: {
+            /** Format: uuid */
             requestTypeId: string;
-            fields: Record<string, unknown>;
-        };
-        RequestHistoryEntryDto: {
-            status: components["schemas"]["RequestStatus"];
-            comment: string | null;
-            changedAt: string;
-        };
-        RequestDto: {
-            id: string;
-            type: components["schemas"]["RequestTypeRefDto"];
-            status: components["schemas"]["RequestStatus"];
-            createdAt: string;
-            estimatedReadyDate: string | null;
-            issuePlace: string | null;
-            issueDeadline: string | null;
-            fields: Record<string, unknown>;
-            canCancel: boolean;
-        };
-        RequestDetailsDto: {
-            id: string;
-            type: components["schemas"]["RequestTypeRefDto"];
-            status: components["schemas"]["RequestStatus"];
-            createdAt: string;
-            estimatedReadyDate: string | null;
-            issuePlace: string | null;
-            issueDeadline: string | null;
-            fields: Record<string, unknown>;
-            canCancel: boolean;
-            history: components["schemas"]["RequestHistoryEntryDto"][];
-        };
-        RequestsResponse: {
-            items: components["schemas"]["RequestDto"][];
+            fields: components["schemas"]["JsonElement"];
         };
         LoginRequest: {
             login: null | string;
@@ -241,6 +262,65 @@ export interface components {
             initials: string;
             student: null | components["schemas"]["StudentProfileDto"];
             staff: null | components["schemas"]["StaffProfileDto"];
+        };
+        RequestDetailsDto: {
+            /** Format: uuid */
+            id: string;
+            type: components["schemas"]["RequestTypeRefDto"];
+            status: components["schemas"]["RequestStatus"];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date */
+            estimatedReadyDate: null | string;
+            issuePlace: null | string;
+            /** Format: date-time */
+            issueDeadline: null | string;
+            fields: components["schemas"]["JsonElement"];
+            canCancel: boolean;
+            history: components["schemas"]["RequestHistoryEntryDto"][];
+        };
+        RequestDto: {
+            /** Format: uuid */
+            id: string;
+            type: components["schemas"]["RequestTypeRefDto"];
+            status: components["schemas"]["RequestStatus"];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date */
+            estimatedReadyDate: null | string;
+            issuePlace: null | string;
+            /** Format: date-time */
+            issueDeadline: null | string;
+            fields: components["schemas"]["JsonElement"];
+            canCancel: boolean;
+        };
+        RequestHistoryEntryDto: {
+            status: components["schemas"]["RequestStatus"];
+            comment: null | string;
+            /** Format: date-time */
+            changedAt: string;
+        };
+        RequestsResponse: {
+            items: components["schemas"]["RequestDto"][];
+        };
+        /** @enum {unknown} */
+        RequestStatus: "Submitted" | "InProgress" | "Ready" | "Issued" | "Rejected" | "Cancelled";
+        RequestTypeDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            description: string;
+            /** Format: int32 */
+            processingDays: number | string;
+            fieldSchema: components["schemas"]["JsonElement"];
+        };
+        RequestTypeRefDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+        };
+        RequestTypesResponse: {
+            items: components["schemas"]["RequestTypeDto"][];
         };
         ScheduleResponse: {
             /** Format: date */
@@ -400,55 +480,171 @@ export interface operations {
         };
     };
     GetRequestTypes: {
-        parameters: { query?: never; header?: never; path?: never; cookie?: never };
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
         requestBody?: never;
         responses: {
-            200: { headers: { [name: string]: unknown }; content: { "application/json": components["schemas"]["RequestTypesResponse"] } };
-            401: { headers: { [name: string]: unknown }; content: { "application/problem+json": unknown } };
-            403: { headers: { [name: string]: unknown }; content: { "application/problem+json": unknown } };
+            /** @description OK */
+            200: {
+                headers: { [name: string]: unknown };
+                content: {
+                    "application/json": components["schemas"]["RequestTypesResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: { [name: string]: unknown };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: { [name: string]: unknown };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
         };
     };
     GetRequests: {
-        parameters: { query?: { status?: components["schemas"]["RequestStatus"] }; header?: never; path?: never; cookie?: never };
+        parameters: {
+            query?: { status?: components["schemas"]["RequestStatus"] };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
         requestBody?: never;
         responses: {
-            200: { headers: { [name: string]: unknown }; content: { "application/json": components["schemas"]["RequestsResponse"] } };
-            400: { headers: { [name: string]: unknown }; content: { "application/problem+json": unknown } };
-            401: { headers: { [name: string]: unknown }; content: { "application/problem+json": unknown } };
-            403: { headers: { [name: string]: unknown }; content: { "application/problem+json": unknown } };
-            404: { headers: { [name: string]: unknown }; content: { "application/problem+json": unknown } };
+            /** @description OK */
+            200: {
+                headers: { [name: string]: unknown };
+                content: { "application/json": components["schemas"]["RequestsResponse"] };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: { [name: string]: unknown };
+                content: { "application/problem+json": components["schemas"]["HttpValidationProblemDetails"] };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: { [name: string]: unknown };
+                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: { [name: string]: unknown };
+                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
+            };
+            /** @description Not Found */
+            404: {
+                headers: { [name: string]: unknown };
+                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
+            };
         };
     };
     CreateRequest: {
         parameters: { query?: never; header?: never; path?: never; cookie?: never };
-        requestBody: { content: { "application/json": components["schemas"]["CreateRequestBody"] } };
+        requestBody: {
+            content: { "application/json": components["schemas"]["CreateRequestBody"] };
+        };
         responses: {
-            201: { headers: { Location?: string; [name: string]: unknown }; content: { "application/json": components["schemas"]["RequestDetailsDto"] } };
-            400: { headers: { [name: string]: unknown }; content: { "application/problem+json": unknown } };
-            401: { headers: { [name: string]: unknown }; content: { "application/problem+json": unknown } };
-            403: { headers: { [name: string]: unknown }; content: { "application/problem+json": unknown } };
-            404: { headers: { [name: string]: unknown }; content: { "application/problem+json": unknown } };
+            /** @description Created */
+            201: {
+                headers: { [name: string]: unknown };
+                content: { "application/json": components["schemas"]["RequestDetailsDto"] };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: { [name: string]: unknown };
+                content: { "application/problem+json": components["schemas"]["HttpValidationProblemDetails"] };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: { [name: string]: unknown };
+                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: { [name: string]: unknown };
+                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
+            };
+            /** @description Not Found */
+            404: {
+                headers: { [name: string]: unknown };
+                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
+            };
         };
     };
     GetRequest: {
-        parameters: { query?: never; header?: never; path: { id: string }; cookie?: never };
+        parameters: {
+            query?: never;
+            header?: never;
+            path: { id: string };
+            cookie?: never;
+        };
         requestBody?: never;
         responses: {
-            200: { headers: { [name: string]: unknown }; content: { "application/json": components["schemas"]["RequestDetailsDto"] } };
-            401: { headers: { [name: string]: unknown }; content: { "application/problem+json": unknown } };
-            403: { headers: { [name: string]: unknown }; content: { "application/problem+json": unknown } };
-            404: { headers: { [name: string]: unknown }; content: { "application/problem+json": unknown } };
+            /** @description OK */
+            200: {
+                headers: { [name: string]: unknown };
+                content: { "application/json": components["schemas"]["RequestDetailsDto"] };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: { [name: string]: unknown };
+                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: { [name: string]: unknown };
+                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
+            };
+            /** @description Not Found */
+            404: {
+                headers: { [name: string]: unknown };
+                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
+            };
         };
     };
     CancelRequest: {
-        parameters: { query?: never; header?: never; path: { id: string }; cookie?: never };
+        parameters: {
+            query?: never;
+            header?: never;
+            path: { id: string };
+            cookie?: never;
+        };
         requestBody?: never;
         responses: {
-            200: { headers: { [name: string]: unknown }; content: { "application/json": components["schemas"]["RequestDetailsDto"] } };
-            401: { headers: { [name: string]: unknown }; content: { "application/problem+json": unknown } };
-            403: { headers: { [name: string]: unknown }; content: { "application/problem+json": unknown } };
-            404: { headers: { [name: string]: unknown }; content: { "application/problem+json": unknown } };
-            409: { headers: { [name: string]: unknown }; content: { "application/problem+json": unknown } };
+            /** @description OK */
+            200: {
+                headers: { [name: string]: unknown };
+                content: { "application/json": components["schemas"]["RequestDetailsDto"] };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: { [name: string]: unknown };
+                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: { [name: string]: unknown };
+                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
+            };
+            /** @description Not Found */
+            404: {
+                headers: { [name: string]: unknown };
+                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
+            };
+            /** @description Conflict */
+            409: {
+                headers: { [name: string]: unknown };
+                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
+            };
         };
     };
     GetSchedule: {

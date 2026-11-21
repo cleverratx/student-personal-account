@@ -3,6 +3,7 @@ import { api, unwrap, type ApiError, type components } from '@/shared/api';
 
 export type RequestStatus = components['schemas']['RequestStatus'];
 export type RequestType = components['schemas']['RequestTypeDto'];
+
 export type RequestItem = components['schemas']['RequestDto'];
 export type RequestDetails = components['schemas']['RequestDetailsDto'];
 export type RequestHistoryEntry = components['schemas']['RequestHistoryEntryDto'];
