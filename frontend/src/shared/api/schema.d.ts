@@ -55,6 +55,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Пары группы того, кто вошёл, за период. Группу сервер берёт только из сессии */
+        get: operations["GetSchedule"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/request-types": {
         parameters: {
             query?: never;
@@ -124,23 +141,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/schedule": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Пары группы того, кто вошёл, за период. Группу сервер берёт только из сессии */
-        get: operations["GetSchedule"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/auth/login": {
         parameters: {
             query?: never;
@@ -175,10 +175,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/staff/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Очередь заявок факультета того, кто вошёл. Факультет сервер берёт только из сессии */
+        get: operations["GetStaffRequests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        CreateRequestBody: {
+            /** Format: uuid */
+            requestTypeId: string;
+            fields: components["schemas"]["JsonElement"];
+        };
         HealthResponse: {
             status: components["schemas"]["HealthStatus"];
             checks: {
@@ -229,11 +251,6 @@ export interface components {
         };
         /** @enum {unknown} */
         LessonType: "Lecture" | "Practice" | "Lab" | "Consultation" | "Exam" | "Credit" | "GradedCredit";
-        CreateRequestBody: {
-            /** Format: uuid */
-            requestTypeId: string;
-            fields: components["schemas"]["JsonElement"];
-        };
         LoginRequest: {
             login: null | string;
             password: null | string;
@@ -336,6 +353,27 @@ export interface components {
             position: string;
             office: null | string;
         };
+        StaffRequestDto: {
+            /** Format: uuid */
+            id: string;
+            student: components["schemas"]["StaffRequestStudentDto"];
+            type: components["schemas"]["RequestTypeRefDto"];
+            status: components["schemas"]["RequestStatus"];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date */
+            estimatedReadyDate: null | string;
+            fields: components["schemas"]["JsonElement"];
+        };
+        StaffRequestsResponse: {
+            items: components["schemas"]["StaffRequestDto"][];
+        };
+        StaffRequestStudentDto: {
+            /** Format: uuid */
+            id: string;
+            fullName: string;
+            group: string;
+        };
         StudentProfileDto: {
             faculty: string;
             programCode: string;
@@ -393,7 +431,7 @@ export interface operations {
                 };
             };
         };
-    };
+    }
     GetMe: {
         parameters: {
             query?: never;
@@ -431,7 +469,7 @@ export interface operations {
                 };
             };
         };
-    };
+    }
     GetMyProfile: {
         parameters: {
             query?: never;
@@ -478,175 +516,7 @@ export interface operations {
                 };
             };
         };
-    };
-    GetRequestTypes: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: { [name: string]: unknown };
-                content: {
-                    "application/json": components["schemas"]["RequestTypesResponse"];
-                };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: { [name: string]: unknown };
-                content: {
-                    "application/problem+json": components["schemas"]["ProblemDetails"];
-                };
-            };
-            /** @description Forbidden */
-            403: {
-                headers: { [name: string]: unknown };
-                content: {
-                    "application/problem+json": components["schemas"]["ProblemDetails"];
-                };
-            };
-        };
-    };
-    GetRequests: {
-        parameters: {
-            query?: { status?: components["schemas"]["RequestStatus"] };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: { [name: string]: unknown };
-                content: { "application/json": components["schemas"]["RequestsResponse"] };
-            };
-            /** @description Bad Request */
-            400: {
-                headers: { [name: string]: unknown };
-                content: { "application/problem+json": components["schemas"]["HttpValidationProblemDetails"] };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: { [name: string]: unknown };
-                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
-            };
-            /** @description Forbidden */
-            403: {
-                headers: { [name: string]: unknown };
-                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
-            };
-            /** @description Not Found */
-            404: {
-                headers: { [name: string]: unknown };
-                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
-            };
-        };
-    };
-    CreateRequest: {
-        parameters: { query?: never; header?: never; path?: never; cookie?: never };
-        requestBody: {
-            content: { "application/json": components["schemas"]["CreateRequestBody"] };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: { [name: string]: unknown };
-                content: { "application/json": components["schemas"]["RequestDetailsDto"] };
-            };
-            /** @description Bad Request */
-            400: {
-                headers: { [name: string]: unknown };
-                content: { "application/problem+json": components["schemas"]["HttpValidationProblemDetails"] };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: { [name: string]: unknown };
-                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
-            };
-            /** @description Forbidden */
-            403: {
-                headers: { [name: string]: unknown };
-                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
-            };
-            /** @description Not Found */
-            404: {
-                headers: { [name: string]: unknown };
-                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
-            };
-        };
-    };
-    GetRequest: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: { id: string };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: { [name: string]: unknown };
-                content: { "application/json": components["schemas"]["RequestDetailsDto"] };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: { [name: string]: unknown };
-                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
-            };
-            /** @description Forbidden */
-            403: {
-                headers: { [name: string]: unknown };
-                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
-            };
-            /** @description Not Found */
-            404: {
-                headers: { [name: string]: unknown };
-                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
-            };
-        };
-    };
-    CancelRequest: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: { id: string };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: { [name: string]: unknown };
-                content: { "application/json": components["schemas"]["RequestDetailsDto"] };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: { [name: string]: unknown };
-                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
-            };
-            /** @description Forbidden */
-            403: {
-                headers: { [name: string]: unknown };
-                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
-            };
-            /** @description Not Found */
-            404: {
-                headers: { [name: string]: unknown };
-                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
-            };
-            /** @description Conflict */
-            409: {
-                headers: { [name: string]: unknown };
-                content: { "application/problem+json": components["schemas"]["ProblemDetails"] };
-            };
-        };
-    };
+    }
     GetSchedule: {
         parameters: {
             query?: {
@@ -714,7 +584,315 @@ export interface operations {
                 };
             };
         };
-    };
+    }
+    GetRequestTypes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RequestTypesResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    }
+    GetRequests: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["RequestStatus"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RequestsResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    }
+    CreateRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateRequestBody"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RequestDetailsDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    }
+    GetRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RequestDetailsDto"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    }
+    CancelRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RequestDetailsDto"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    }
     Login: {
         parameters: {
             query?: never;
@@ -774,7 +952,7 @@ export interface operations {
                 };
             };
         };
-    };
+    }
     Logout: {
         parameters: {
             query?: never;
@@ -819,5 +997,61 @@ export interface operations {
                 };
             };
         };
-    };
+    }
+    GetStaffRequests: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffRequestsResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    }
 }
