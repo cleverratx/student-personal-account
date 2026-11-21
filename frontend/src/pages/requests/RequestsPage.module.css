@@ -1,0 +1,76 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.sectionTitle {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: var(--leading-sm);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-3);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  text-decoration: none;
+  color: inherit;
+  min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+  transition: box-shadow 0.15s;
+}
+
+.card:active {
+  box-shadow: var(--shadow-raised);
+}
+
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.cardName {
+  font-size: var(--text-md);
+  font-weight: 600;
+  line-height: 22px;
+  color: var(--color-text);
+  flex: 1;
+  min-width: 0;
+}
+
+.cardHint {
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+  color: var(--color-text-secondary);
+}
+
+.cardHintDanger {
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+  color: var(--color-danger);
+}
+
+.newBtn {
+  padding-top: var(--space-2);
+}
