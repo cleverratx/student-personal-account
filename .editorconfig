@@ -1,4 +1,3 @@
-dotnet format --no-restore
 root = true
 
 [*]
