@@ -114,8 +114,7 @@ namespace Dekanat.Api.Features.Grades
             AppDbContext db,
             CancellationToken cancellationToken )
         {
-            // должно быть (с явными пробелами, которые форматтер принимает):
-            if ( semester is null or < 1 or > 20 )
+            if ( semester is null || semester < 1 || semester > 20 )
             {
                 return TypedResults.ValidationProblem( new Dictionary<string, string[]>
                 {
@@ -170,8 +169,7 @@ namespace Dekanat.Api.Features.Grades
             UniversityClock clock,
             CancellationToken cancellationToken )
         {
-            // должно быть (с явными пробелами, которые форматтер принимает):
-            if ( semester is null or < 1 or > 20 )
+            if ( semester is null || semester < 1 || semester > 20 )
             {
                 return TypedResults.ValidationProblem( new Dictionary<string, string[]>
                 {
