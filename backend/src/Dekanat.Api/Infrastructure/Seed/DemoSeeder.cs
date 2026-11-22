@@ -1,4 +1,5 @@
 using Dekanat.Api.Features.Auth;
+using Dekanat.Api.Features.Grades;
 using Dekanat.Api.Features.Profile;
 using Dekanat.Api.Features.Schedule;
 using Dekanat.Api.Infrastructure.Persistence;
@@ -63,6 +64,9 @@ namespace Dekanat.Api.Infrastructure.Seed
                 await db.SaveChangesAsync();
                 logger.LogInformation( "Демо-расписание группы {Group}: {Count} пар", group.Name, lessons.Count );
             }
+
+            // Оценки и расписание сессии — после расписания, чтобы дисциплины уже были в базе.
+            await GradesSeed.SeedGradesAsync( db, clock, logger );
         }
 
         private static async Task<Dictionary<string, Faculty>> EnsureFacultiesAsync( AppDbContext db )

@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Dekanat.Api.Features.Auth;
+using Dekanat.Api.Features.Grades;
 using Dekanat.Api.Features.Profile;
 using Dekanat.Api.Features.Requests;
 using Dekanat.Api.Features.Schedule;
@@ -34,6 +35,7 @@ api.MapHealth();
 api.MapAuth();
 api.MapProfile();
 api.MapSchedule();
+api.MapGrades();
 api.MapRequests();
 api.MapStaff();
 
