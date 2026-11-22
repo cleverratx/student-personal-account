@@ -47,46 +47,74 @@ namespace Dekanat.Api.Infrastructure.Seed
             List<Assessment> assessments =
             [
                 // ── ПИ-21, Иванова (семестр 1 — все сдано) ──────────────────
-                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "Математический анализ",   1, Exam,         grade: 5, points: 87, date: "2026-01-15", status: Passed ),
-                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "Линейная алгебра",        1, GradedCredit, grade: 4, points: 74, date: "2026-01-18", status: Passed ),
-                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "Основы программирования", 1, Exam,         grade: 5, points: 94, date: "2026-01-20", status: Passed ),
-                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "Английский язык",         1, Credit,       isPassed: true,         date: "2026-01-12", status: Passed ),
-                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "История России",          1, Credit,       isPassed: true,         date: "2026-01-10", status: Passed ),
-
+                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "Математический анализ",
+                    1, Exam, grade: 5, points: 87, date: "2026-01-15", status: Passed ),
+                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "Линейная алгебра",
+                    1, GradedCredit, grade: 4, points: 74, date: "2026-01-18", status: Passed ),
+                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "Основы программирования",
+                    1, Exam, grade: 5, points: 94, date: "2026-01-20", status: Passed ),
+                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "Английский язык",
+                    1, Credit, isPassed: true, date: "2026-01-12", status: Passed ),
+                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "История России",
+                    1, Credit, isPassed: true, date: "2026-01-10", status: Passed ),
+            
                 // ── ПИ-21, Иванова (семестр 2 — текущий, долга нет) ─────────
-                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "Математический анализ",   2, Exam,   null, null,   null,  Failed ),
-                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "Дискретная математика",   2, Exam,   null, null,   null,  Failed ),
-                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "Основы программирования", 2, Credit, null, null,   null,  Failed ),
-                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "Физика",                  2, Credit, null, null,   null,  Failed ),
-
+                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "Математический анализ",
+                    2, Exam, null, null, null, Failed ),
+                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "Дискретная математика",
+                    2, Exam, null, null, null, Failed ),
+                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "Основы программирования",
+                    2, Credit, null, null, null, Failed ),
+                Make( students, disciplines, "ПИ-21:Иванова Анастасия Сергеевна", "Физика",
+                    2, Credit, null, null, null, Failed ),
+            
                 // ── ПИ-21, Марков (семестр 1 — долг по физике) ──────────────
-                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "Математический анализ",   1, Exam,         grade: 4, points: 68, date: "2026-01-15", status: Passed ),
-                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "Линейная алгебра",        1, GradedCredit, grade: 3, points: 55, date: "2026-01-18", status: Passed ),
-                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "Основы программирования", 1, Exam,         grade: 4, points: 72, date: "2026-01-20", status: Passed ),
-                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "Английский язык",         1, Credit,       isPassed: true,         date: "2026-01-12", status: Passed ),
-                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "История России",          1, Credit,       isPassed: false,        date: "2026-01-10", status: Debt ),
-
+                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "Математический анализ",
+                    1, Exam, grade: 4, points: 68, date: "2026-01-15", status: Passed ),
+                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "Линейная алгебра",
+                    1, GradedCredit, grade: 3, points: 55, date: "2026-01-18", status: Passed ),
+                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "Основы программирования",
+                    1, Exam, grade: 4, points: 72, date: "2026-01-20", status: Passed ),
+                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "Английский язык",
+                    1, Credit, isPassed: true, date: "2026-01-12", status: Passed ),
+                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "История России",
+                    1, Credit, isPassed: false, date: "2026-01-10", status: Debt ),
+            
                 // ── ПИ-21, Марков (семестр 2 — текущий, не допущен к дискретной) ─
-                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "Математический анализ",   2, Exam,   null, null, null, Failed ),
-                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "Дискретная математика",   2, Exam,   null, null, null, NotAdmitted ),
-                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "Основы программирования", 2, Credit, null, null, null, Failed ),
-                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "Физика",                  2, Credit, null, null, null, Failed ),
-
+                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "Математический анализ",
+                    2, Exam, null, null, null, Failed ),
+                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "Дискретная математика",
+                    2, Exam, null, null, null, NotAdmitted ),
+                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "Основы программирования",
+                    2, Credit, null, null, null, Failed ),
+                Make( students, disciplines, "ПИ-21:Марков Марк Андреевич", "Физика",
+                    2, Credit, null, null, null, Failed ),
+            
                 // ── ИВТ-23, Лебедев (семестр 2 — уже прошёл, все сдано) ─────
-                Make( students, disciplines, "ИВТ-23:Лебедев Глеб Олегович", "Алгоритмы и структуры данных", 2, Exam,         grade: 5, points: 91, date: "2026-01-14", status: Passed ),
-                Make( students, disciplines, "ИВТ-23:Лебедев Глеб Олегович", "Базы данных",                  2, GradedCredit, grade: 5, points: 88, date: "2026-01-16", status: Passed ),
-                Make( students, disciplines, "ИВТ-23:Лебедев Глеб Олегович", "Операционные системы",          2, Exam,         grade: 4, points: 79, date: "2026-01-19", status: Passed ),
-                Make( students, disciplines, "ИВТ-23:Лебедев Глеб Олегович", "Английский язык",               2, Credit,       isPassed: true,         date: "2026-01-11", status: Passed ),
-
+                Make( students, disciplines, "ИВТ-23:Лебедев Глеб Олегович", "Алгоритмы и структуры данных",
+                    2, Exam, grade: 5, points: 91, date: "2026-01-14", status: Passed ),
+                Make( students, disciplines, "ИВТ-23:Лебедев Глеб Олегович", "Базы данных",
+                    2, GradedCredit, grade: 5, points: 88, date: "2026-01-16", status: Passed ),
+                Make( students, disciplines, "ИВТ-23:Лебедев Глеб Олегович", "Операционные системы",
+                    2, Exam, grade: 4, points: 79, date: "2026-01-19", status: Passed ),
+                Make( students, disciplines, "ИВТ-23:Лебедев Глеб Олегович", "Английский язык",
+                    2, Credit, isPassed: true, date: "2026-01-11", status: Passed ),
+            
                 // ── ИВТ-23, Лебедев (семестр 3 — текущий) ───────────────────
-                Make( students, disciplines, "ИВТ-23:Лебедев Глеб Олегович", "Алгоритмы и структуры данных", 3, Exam,         null, null, null, Failed ),
-                Make( students, disciplines, "ИВТ-23:Лебедев Глеб Олегович", "Операционные системы",          3, GradedCredit, null, null, null, Failed ),
-                Make( students, disciplines, "ИВТ-23:Лебедев Глеб Олегович", "Математический анализ",         3, Credit,       null, null, null, Failed ),
-
+                Make( students, disciplines, "ИВТ-23:Лебедев Глеб Олегович", "Алгоритмы и структуры данных",
+                    3, Exam, null, null, null, Failed ),
+                Make( students, disciplines, "ИВТ-23:Лебедев Глеб Олегович", "Операционные системы",
+                    3, GradedCredit, null, null, null, Failed ),
+                Make( students, disciplines, "ИВТ-23:Лебедев Глеб Олегович", "Математический анализ",
+                    3, Credit, null, null, null, Failed ),
+            
                 // ── БИ-31, Захаров (семестр 4 — один долг) ──────────────────
-                Make( students, disciplines, "БИ-31:Захаров Илья Викторович", "Микроэкономика",             4, Exam,         grade: 3, points: 51, date: "2026-01-13", status: Passed ),
-                Make( students, disciplines, "БИ-31:Захаров Илья Викторович", "Моделирование бизнес-процессов", 4, GradedCredit, grade: 2, date: "2026-01-17", status: Debt ),
-                Make( students, disciplines, "БИ-31:Захаров Илья Викторович", "Английский язык",             4, Credit,       isPassed: true,         date: "2026-01-09", status: Passed ),
+                Make( students, disciplines, "БИ-31:Захаров Илья Викторович", "Микроэкономика",
+                    4, Exam, grade: 3, points: 51, date: "2026-01-13", status: Passed ),
+                Make( students, disciplines, "БИ-31:Захаров Илья Викторович", "Моделирование бизнес-процессов",
+                    4, GradedCredit, grade: 2, date: "2026-01-17", status: Debt ),
+                Make( students, disciplines, "БИ-31:Захаров Илья Викторович", "Английский язык",
+                    4, Credit, isPassed: true, date: "2026-01-09", status: Passed ),
             ];
 
             db.Set<Assessment>().AddRange( assessments );
